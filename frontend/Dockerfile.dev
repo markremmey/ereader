@@ -1,0 +1,29 @@
+# ⏳ 1️⃣ Base image
+FROM node:20-alpine
+
+# 🗂️ set workdir
+WORKDIR /app
+
+# enable Yarn via corepack
+RUN corepack enable
+
+# 📋 install deps
+COPY package.json yarn.lock ./
+RUN yarn install --frozen-lockfile --non-interactive
+
+# 👀 enable file-watch polling (often necessary in Docker)
+ENV CHOKIDAR_USEPOLLING=true
+ENV CHOKIDAR_INTERVAL=100
+
+# 🔁 mount your source in docker-compose so edits show up
+#    and keep node_modules inside the container
+VOLUME [ "/app/node_modules" ]
+
+# 📂 copy everything else
+COPY . .
+
+# 🌐 expose Vite's default dev port
+EXPOSE 5173
+
+# ▶️ run the Vite dev server on 0.0.0.0 so it’s reachable
+CMD [ "yarn", "dev", "--host", "0.0.0.0" ]
