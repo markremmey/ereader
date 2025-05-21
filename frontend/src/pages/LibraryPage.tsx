@@ -4,20 +4,17 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 // Define a TypeScript interface for Book (adjust fields based on actual API)
-interface Book {
+interface BookBlob {
   id: number;
-  title: string;
-  author?: string;
-  // any other fields like cover image, etc.
+  name: string
 }
 
 const LibraryPage: React.FC = () => {
   const { token, logout } = useAuth();
   const navigate = useNavigate();
-  const [books, setBooks] = useState<Book[]>([]);
+  const [bookBlobList, setBookBlobList] = useState<BookBlob[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  // const [uploading, setUploading] = useState<boolean>(false);
 
   useEffect(() => {
     // If somehow this page renders without a token, redirect (safety check)
@@ -40,8 +37,11 @@ const LibraryPage: React.FC = () => {
         if (!res.ok) {
           throw new Error('Failed to fetch books');
         }
+        console.log("LibraryPage.tsx, fetchBooks res: ", res)
         const data = await res.json();
-        setBooks(data);  // assuming data is an array of books
+        console.log("LibraryPage.tsx, fetchBooks data: ", data)
+        setBookBlobList(data.blob_list);  // assuming data is an array of books
+
       } catch (err) {
         setError('Could not load books.');
       } finally {
@@ -59,54 +59,29 @@ const LibraryPage: React.FC = () => {
     return <p>{error}</p>;
   }
 
-  // const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   const file = event.target.files?.[0];
-  //   if (!file) return;
-  //   setUploading(true);
-  //   try {
-  //     const formData = new FormData();
-  //     formData.append('file', file);
-  //     const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/books/upload`, {
-  //       method: 'POST',
-  //       headers: { 'Authorization': `Bearer ${token}` },
-  //       body: formData
-  //     });
-  //     if (!res.ok) {
-  //       throw new Error('Failed to upload book');
-  //     }
-  //     const data = await res.json();
-  //     setBooks(prev => [...prev, data]);
-  //   } catch (err) {
-  //     setError('Could not upload book.');
-  //   } finally {
-  //     setUploading(false);
-  //   }
-  // };
-
   return (
     <div className="flex flex-col h-screen">
       <h2 className="text-2xl font-bold p-4">Your Library</h2>
-      {/* <input 
-        type="file" 
-        accept=".pdf, .epub" 
-        onChange={handleFileChange} 
-        disabled={uploading}
-      />
-      {uploading && <p>Uploading...</p>}
-      {error && <p>{error}</p>} */}
-      {books.length === 0 ? (
+      {bookBlobList.length === 0 ? (
         <p>No books found. Upload some books to get started!</p>
       ) : (
         <ul>
-          {books.map(book => (
-            <li key={book.id}>
-              <strong>{book.title}</strong>{book.author ? ` by ${book.author}` : ''} 
-              – <Link to={`/reader/${book.id}`}>Read</Link>
+          {bookBlobList.map(Blobitem => (
+            <li key={Blobitem.id}>
+              <strong>{Blobitem.id}</strong> 
+              - <Link to={`/reader/${Blobitem.name}`}>Read Book "{Blobitem.name}"</Link>
             </li>
           ))}
         </ul>
       )}
-      <button onClick={logout}>Log Out</button>
+    <div className="mt-auto flex gap-4">
+      <button onClick={logout} className="text-red-500 underline">
+        Log Out
+      </button>
+      <Link to="/login" className="text-blue-500 underline">
+        Back to Login
+      </Link>
+    </div>
     </div>
   );
 };

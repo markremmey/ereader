@@ -15,6 +15,14 @@ class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
 
+class BlobObj(BaseModel):
+    id: str
+    name: str
+    url: str
+
+class BlobList(BaseModel):
+    blob_list: list[BlobObj]
+
 class BookInfo(BaseModel):
     id: int
     title: str

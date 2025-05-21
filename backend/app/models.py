@@ -17,7 +17,10 @@ class Book(Base):
     __tablename__ = "books"
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String(200), nullable=False)
-    file_name = Column(String(200), nullable=False)      # stored file name
+    author = Column(String(200), nullable=False)
+    blob_name = Column(String(200), nullable=False)
+    cover_blob_name = Column(String(200), nullable=False)
+    blob_container = Column(String(20), nullable=False)
     content_type = Column(String(20), nullable=False)    # "pdf" or "epub"
     owner_id = Column(Integer, ForeignKey("users.id"))
     owner = relationship("User", back_populates="books")
