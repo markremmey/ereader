@@ -1,6 +1,6 @@
 # Ignore node_modules
 node_modules
-
+*.env
 # Ignore build output
 build
 
