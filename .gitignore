@@ -6,7 +6,7 @@ build
 
 # Ignore test-epub
 src/test-epub
-
+backend/.env
 
 # Ignore uploads
 uploads
