@@ -3,9 +3,9 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-
+import os
 from . import models, database
-from .routes import auth as auth_routes, books as books_routes
+from .routes import auth as auth_routes, books as books_routes, chat as chat_routes
 
 # Initialize database (create tables)
 models.Base.metadata.create_all(bind=database.engine)
@@ -30,3 +30,4 @@ app.mount("/uploads", StaticFiles(directory=uploads_dir), name="uploads")
 # Include API routers (all under /api for clarity)
 app.include_router(auth_routes.router, prefix="/api")
 app.include_router(books_routes.router, prefix="/api")
+app.include_router(chat_routes.router, prefix="/api")

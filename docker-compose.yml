@@ -4,16 +4,13 @@ services:
   backend:
     build: 
       context: ./backend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     ports:
       - "8000:8000"
     env_file:
       - backend/.env
     volumes:
-      - ./backend/uploads:/app/uploads
       - ./backend/app:/app/app
-      - ./pyproject.toml:/app/pyproject.toml
-      - ./uv.lock:/app/uv.lock
     depends_on:
       - db
       - redis
@@ -29,8 +26,8 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
-    command: yarn dev --host 0.0.0.0
-
+    command: >
+      sh -c "yarn install && yarn dev --host 0.0.0.0"
   db:
     image: postgres:15-alpine
     environment:

@@ -1,0 +1,16 @@
+# backend/Dockerfile.prod
+FROM python:3.12-slim
+
+# bring in uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
+# copy your app & install deps
+COPY . /app
+WORKDIR /app
+RUN uv sync --locked --no-cache
+
+# document the port (optional)
+EXPOSE 8000
+
+# run without --reload
+CMD ["/app/.venv/bin/fastapi", "run", "app/main.py", "--host", "0.0.0.0", "--port", "8000"]

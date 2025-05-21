@@ -1,0 +1,20 @@
+# frontend/Dockerfile.prod
+FROM node:20-alpine
+
+WORKDIR /app
+RUN corepack enable
+
+# 1) install deps
+COPY package.json yarn.lock ./
+RUN yarn install --frozen-lockfile
+
+# 2) build static assets
+COPY . .
+RUN yarn build
+
+# 3) install a simple static server
+RUN yarn global add serve
+
+# 4) serve the build on port 80
+EXPOSE 80
+CMD ["serve", "-s", "dist", "-l", "80"]

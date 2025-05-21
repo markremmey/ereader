@@ -1,0 +1,14 @@
+# Ignore node_modules
+node_modules
+
+# Ignore build output
+build
+
+# Ignore test-epub
+src/test-epub
+
+
+# Ignore uploads
+uploads
+
+localCommands

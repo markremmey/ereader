@@ -5,6 +5,8 @@ from fastapi.responses import FileResponse, StreamingResponse, HTMLResponse
 from sqlalchemy.orm import Session
 import ebooklib
 from ebooklib import epub
+import logging
+# import bleach
 
 from .. import models, schemas, auth, database
 from ..services.storage import storage_service
@@ -69,6 +71,7 @@ def get_book_file(book_id: int,
     else:
         # For ePub, we do not return the raw file (we will have a separate endpoint to read content)
         # Alternatively, could stream the file if needed.
+        logging.info(f"Returning ePub file: {file_path}")
         return FileResponse(file_path, media_type="application/epub+zip", filename=book.file_name)
 
 @router.get("/{book_id}/chapters")
@@ -129,8 +132,9 @@ def read_chapter(book_id: int, index: int,
     if index < 0 or index >= len(chapters):
         raise HTTPException(status_code=400, detail="Chapter index out of range")
     chapter_item = chapters[index]
-    html_content = chapter_item.get_content().decode("utf-8", errors="ignore")
+    clean = chapter_item.get_content().decode("utf-8", errors="ignore")
+    # clean = bleach.clean(html)
     # Cache the chapter content for future
     if redis_client:
-        redis_client.set(cache_key, html_content)
-    return HTMLResponse(content=html_content)
+        redis_client.set(cache_key, clean)
+    return HTMLResponse(content=clean)
