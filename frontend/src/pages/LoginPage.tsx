@@ -23,31 +23,60 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="login-page">
-      <h2>Login</h2>
-      <form onSubmit={handleSubmit}>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4">
+      <div className="max-w-sm w-full bg-white rounded-2xl shadow-md p-8 space-y-6">
+        <h2 className="text-2xl font-semibold text-center text-gray-800">
+            Welcome Back
+        </h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {error && (
+            <div className="text-red-600 text-sm text-center">
+              {error}
+            </div>
+        )}
+
         <div>
-          <label>Username:</label><br/>
-          <input 
-            type="text" 
-            value={username} 
-            onChange={e => setUsername(e.target.value)} 
-            required 
+          <label className="block text-gray-700 mb-1" htmlFor="username">
+            Username
+          </label>
+          <input
+            id="username"
+            type="text"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            value={username}
+            onChange={e => setUsername(e.target.value)}
+            required
           />
         </div>
+
         <div>
-          <label>Password:</label><br/>
-          <input 
-            type="password" 
-            value={password} 
-            onChange={e => setPassword(e.target.value)} 
-            required 
+          <label className="block text-gray-700 mb-1" htmlFor="password">
+            Password
+          </label>
+          <input
+            id="password"
+            type="password"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            required
           />
         </div>
-        {error && <p style={{color:'red'}}>{error}</p>}
-        <button type="submit">Log In</button>
+
+        <button
+          type="submit"
+          className="w-full py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition"
+        >
+          Log In
+        </button>
       </form>
-      <p>New user? <Link to="/register">Register here</Link></p>
+      <p className="text-center text-gray-600 text-sm">
+          New user?{' '}
+          <Link to="/register" className="text-indigo-600 hover:underline">
+            Register here
+          </Link>
+        </p>
+      </div>
     </div>
   );
 };

@@ -79,14 +79,14 @@ const ChatWindow: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full bg-white text-black rounded-lg shadow-sm">
-      <div className="flex-1 overflow-y-auto px-2 py-4 space-y-3">
+      <div className="flex flex-col flex-1 overflow-y-auto px-2 py-4 space-y-3">
           {messages.map((msg, i) => (
             <div
               key={i}
-              className={`max-w-[75%] px-3 py-2 rounded-lg ${
+              className={`px-3 py-2 rounded-lg ${
                 msg.sender === 'user'
-                  ? 'self-end bg-black text-white rounded-br-none'
-                  : 'self-start bg-gray-200 text-black rounded-bl-none'
+                  ? 'max-w-[75%] self-end bg-gray-200 text-black rounded-br-none'
+                  : 'max-w-[100%] self-start bg-white text-black rounded-bl-none'
               }`}
             >
               {msg.text}
@@ -96,7 +96,7 @@ const ChatWindow: React.FC = () => {
       </div>
       
       <div className="border-t border-gray-300 p-2 flex items-center">
-      <input
+        <input
           type="text"
           className="flex-1 bg-gray-100 rounded-l-md px-4 py-2 focus:outline-none"
           placeholder="Type your message…"

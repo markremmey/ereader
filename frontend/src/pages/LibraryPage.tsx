@@ -84,8 +84,8 @@ const LibraryPage: React.FC = () => {
   // };
 
   return (
-    <div className="library-page">
-      <h2>Your Library</h2>
+    <div className="flex flex-col h-screen">
+      <h2 className="text-2xl font-bold p-4">Your Library</h2>
       {/* <input 
         type="file" 
         accept=".pdf, .epub" 

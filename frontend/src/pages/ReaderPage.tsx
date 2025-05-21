@@ -8,7 +8,7 @@ const ReaderPage = () => {
 
   return (
     <div className="flex h-screen">
-      <div className="w-300 h-full overflow-hidden">
+      <div className="flex-2/3 h-full overflow-hidden">
         <ReactReader 
           url="/src/test-epub/pg18569-images-3.epub" 
           title="My ePub Book" 
@@ -17,7 +17,7 @@ const ReaderPage = () => {
         />
       </div>
 
-      <div className="w-300 h-full border-l p-4">
+      <div className="flex-1/3 h-full border-l p-4">
         <ChatWindow />
       </div>
     </div>
