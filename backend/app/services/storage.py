@@ -14,7 +14,6 @@ class AzureBlobStorageService:
         self.container = os.getenv("AZURE_STORAGE_CONTAINER_NAME")
         self.account_key = os.getenv("AZURE_STORAGE_ACCOUNT_KEY")
 
-
     def generate_sas_url(self, blob_name: str, expires_in_hours: int = 1):
         sas = generate_blob_sas(
             account_name=self.account_name,
@@ -25,7 +24,7 @@ class AzureBlobStorageService:
             expiry=datetime.now(timezone.utc) + timedelta(hours=expires_in_hours),
         )
         return f"https://{self.account_name}.blob.core.windows.net/{self.container}/{blob_name}?{sas}"
-
+        # return sas
     def list_blobs(self):
         container_client = self.blob_svc.get_container_client(self.container)
         blob_list = container_client.list_blobs()

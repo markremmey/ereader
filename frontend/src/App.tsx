@@ -21,7 +21,7 @@ function App() {
       <Route path="/library" element={
         token ? <LibraryPage /> : <Navigate to="/login" replace />
       }/>
-      <Route path="/reader/:bookId" element={
+      <Route path="/reader/:blobName" element={
         token ? <ReaderPage /> : <Navigate to="/login" replace />
       }/>
     </Routes>

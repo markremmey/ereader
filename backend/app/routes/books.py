@@ -22,9 +22,13 @@ def list_books(db: Session = Depends(database.get_db), current_user: models.User
     logging.info(f"blob_list: {blob_list}")
     return schemas.BlobList(blob_list=blob_list)
 
-def get_blob_sas(book_id: int):
+@router.get("/get_full_blob_url/{blob_name}", response_model=str)
+def get_blob_sas(blob_name: str):
+    logging.info(f"blob_name: {blob_name}")
     blob_service = AzureBlobStorageService()
-    return blob_service.generate_sas_url(blob_service.list_blobs()[book_id])
+    sasUrl = blob_service.generate_sas_url(blob_name)
+    logging.info(f"sasUrl: {sasUrl}")
+    return sasUrl
 
 @router.get("/{book_id}/file")
 def get_book_file(book_id: int, 

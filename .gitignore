@@ -7,7 +7,7 @@ build
 # Ignore test-epub
 src/test-epub
 backend/.env
-
+localStorage
 # Ignore uploads
 uploads
 
