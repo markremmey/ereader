@@ -11,6 +11,7 @@ const ReaderPage: React.FC = () => {
   );
   console.log("ReaderPage");
   console.log("blobName: ", blobName);
+  console.log('render')
   useEffect(() => {
     console.log("useEffect");
     if (!blobName) return;
@@ -18,7 +19,7 @@ const ReaderPage: React.FC = () => {
     const fetchBlobUrl = async () => {
       try {
         const res = await fetch(
-          `${import.meta.env.VITE_API_BASE_URL}/books/get_full_blob_url/${blobName}`
+          `${import.meta.env.VITE_API_BASE_URL}/books/get_full_blob_url/${blobName}?t=${Date.now()}`
         );
         if (!res.ok) throw new Error('Failed to fetch blob URL');
         const data = await res.json();

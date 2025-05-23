@@ -1,10 +1,13 @@
-# frontend/Dockerfile.prod
+# ⏳ 1️⃣ Base image
 FROM node:20-alpine
 
+# 🗂️ set workdir
 WORKDIR /app
+
+# enable Yarn via corepack
 RUN corepack enable
 
-# 1) install deps
+# 📋 install deps
 COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile
 

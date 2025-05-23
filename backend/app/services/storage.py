@@ -24,9 +24,14 @@ class AzureBlobStorageService:
             expiry=datetime.now(timezone.utc) + timedelta(hours=expires_in_hours),
         )
         return f"https://{self.account_name}.blob.core.windows.net/{self.container}/{blob_name}?{sas}"
-        # return sas
+
     def list_blobs(self):
         container_client = self.blob_svc.get_container_client(self.container)
         blob_list = container_client.list_blobs()
         return [blob.name for blob in blob_list]
+    
+    def upload_blob(self, blob_name: str, data: bytes):
+        container_client = self.blob_svc.get_container_client(self.container)
+        blob_client = container_client.get_blob_client(blob_name)
+        blob_client.upload_blob(data)
 
