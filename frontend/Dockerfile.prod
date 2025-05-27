@@ -1,23 +1,23 @@
-# ⏳ 1️⃣ Base image
+# 1) Build stage
 FROM node:20-alpine
-
-# 🗂️ set workdir
 WORKDIR /app
-
-# enable Yarn via corepack
 RUN corepack enable
-
-# 📋 install deps
 COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile
-
-# 2) build static assets
 COPY . .
 RUN yarn build
 
-# 3) install a simple static server
-RUN yarn global add serve
+# 2) Nginx stage
+FROM nginx:stable-alpine
+# Remove default config
+RUN rm /etc/nginx/conf.d/default.conf
 
-# 4) serve the build on port 80
+# Copy your custom Nginx config
+COPY nginx.conf /etc/nginx/conf.d/
+
+# Copy in built static assets
+COPY --from=build /app/dist /usr/share/nginx/html
+
 EXPOSE 80
-CMD ["serve", "-s", "dist", "-l", "80"]
+# Run Nginx in foreground
+CMD ["nginx", "-g", "daemon off;"]

@@ -12,3 +12,6 @@ localStorage
 uploads
 
 localCommands
+
+nginx-dev
+nginx-dev/certs

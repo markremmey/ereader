@@ -12,6 +12,27 @@ services:
       - "8000:8000"         # maps container’s 8000 → host’s 8000
     restart: unless-stopped
 
+  nginx:
+    image: nginx:1.25-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
+    depends_on:
+      - frontend
+      - backend
+      
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: ereader
+      POSTGRES_PASSWORD: ereaderpass
+      POSTGRES_DB: ereader
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
   frontend:
     build:
       context: ./frontend
@@ -21,3 +42,6 @@ services:
     depends_on:
       - backend
     restart: unless-stopped
+
+volumes:
+  db-data:
