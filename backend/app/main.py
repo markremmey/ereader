@@ -15,7 +15,13 @@ app = FastAPI(title="eReader API", version="0.1.0")
 # CORS settings – allow the React frontend to call this API
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://localhost","http://localhost:3000", "http://localhost:5173"],  # frontend origin
+    allow_origins=[
+        "https://localhost",
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "https://lyceum-app.com",
+        "https://www.lyceum-app.com",
+    ],  # frontend origin
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
