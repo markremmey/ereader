@@ -6,6 +6,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile.prod
+    image: ereader-backend:latest
     env_file:
       - ./backend/.env      # your DATABASE_URL, REDIS_URL, etc.
     ports:
