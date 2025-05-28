@@ -28,6 +28,8 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    env_file:
+      - ./frontend/.env
     volumes:
       - ./frontend/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./frontend/nginx/certs:/etc/nginx/certs:ro
