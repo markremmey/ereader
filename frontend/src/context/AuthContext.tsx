@@ -12,7 +12,7 @@ interface AuthContextType {
 // Create context with default dummy values (to satisfy TypeScript)
 const AuthContext = createContext<AuthContextType>({
   token: null,
-  login: async () => { /* default no-op */ },
+  login: async () => {},
   logout: () => {}
 });
 
@@ -21,9 +21,17 @@ export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const navigate = useNavigate();
-  const [token, setToken] = useState<string | null>(
-    localStorage.getItem('token')  // initialize from storage if available
-  );
+  const isDev = import.meta.env.DEV;
+  console.log("AuthContext.tsx: isDev: ", isDev)
+  const [token, setToken] = useState<string | null>(() => {
+    if (isDev) {
+      const devToken = 'dev-bypass-token';
+      localStorage.setItem('token', devToken);
+      return devToken;
+    }
+    return localStorage.getItem('token');
+  });
+  
 
   // Login function: call backend then store token
   const login = async (username: string, password: string) => {

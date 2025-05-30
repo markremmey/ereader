@@ -7,7 +7,7 @@ type Message = {
 };
 
 const ChatWindow: React.FC = () => {
-  console.log("ChatWindow")
+  // console.log("ChatWindow")
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState<string>('');

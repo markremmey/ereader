@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import os
-from . import models, database
+from . import models, database, auth
 from .routes import auth as auth_routes, books as books_routes, chat as chat_routes
 
 # Initialize database (create tables)
@@ -37,3 +37,15 @@ app.mount("/uploads", StaticFiles(directory=uploads_dir), name="uploads")
 app.include_router(auth_routes.router, prefix="/api")
 app.include_router(books_routes.router, prefix="/api")
 app.include_router(chat_routes.router, prefix="/api")
+
+if os.getenv("DEV_MODE"):
+    def override_get_current_user():
+        """
+        Return a “fake” user for development.
+        You can either construct a User in memory, or
+        fetch/create one from your database here.
+        """
+        return models.User(id=1, username="dev-user")
+    
+    app.dependency_overrides[auth.get_current_user] = override_get_current_user
+

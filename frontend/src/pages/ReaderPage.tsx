@@ -1,40 +1,49 @@
 import React, { useState, useEffect } from 'react';
 import { ReactReader } from 'react-reader';
 import ChatWindow from '../components/ChatWindow';
-import { useParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 
 const ReaderPage: React.FC = () => {
-  const { blobName } = useParams<{ blobName: string }>();
-  const [blobUrl, setBlobUrl] = useState<string | null>(null);
+  const [searchParams] = useSearchParams();
+  const blobName = searchParams.get('blobName');
+  console.log("ReaderPage.tsx, blobName: ", blobName);
+  const [epubData, setEpubData] = useState<ArrayBuffer | string>("");
   const [location, setLocation] = useState<string | number>(
     'epubcfi(/6/2[cover]!/6)'
   );
-  console.log("ReaderPage");
-  console.log("blobName: ", blobName);
-  console.log('render')
+  
+  const fetchBlobUrl = async () => {
+    try {
+      // Get the blob URL from the API
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/books/get_full_blob_url/${blobName}`
+      );
+      if (!res.ok) throw new Error('Failed to fetch blob URL');
+      const url = await res.json();
+      console.log("url: ", url);
+
+      // Get the epub data from the blob URL
+      const epubRes = await fetch(url);
+      console.log("epubRes: ", epubRes);
+      if (!epubRes.ok) throw new Error('Failed to fetch epub');
+      const epubArrayBuffer = await epubRes.arrayBuffer();
+      console.log("epubArrayBuffer: ", epubArrayBuffer);
+
+      setEpubData(epubArrayBuffer);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  
   useEffect(() => {
-    console.log("useEffect");
     if (!blobName) return;
-    console.log("blobName: ", blobName);
-    const fetchBlobUrl = async () => {
-      try {
-        const res = await fetch(
-          `${import.meta.env.VITE_API_BASE_URL}/books/get_full_blob_url/${blobName}?t=${Date.now()}`
-        );
-        if (!res.ok) throw new Error('Failed to fetch blob URL');
-        const data = await res.json();
-        console.log("data: ", data);
-        setBlobUrl(data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
+    console.log("ReaderPage.tsx, useEffect, fetching blobName: ", blobName);
 
     fetchBlobUrl();
   }, [blobName]);
 
   // While we’re loading the URL...
-  if (!blobUrl) {
+  if (!blobName) {
     return <div>Loading book…</div>;
   }
 
@@ -42,9 +51,8 @@ const ReaderPage: React.FC = () => {
     <div className="flex h-screen">
       <div className="flex-2/3 h-full overflow-hidden">
         <ReactReader
-          // url="https://ebookcontent.blob.core.windows.net/defaultlibrary/pg6130-images-3.epub?sp=r&st=2025-05-22T01:17:42Z&se=2025-05-22T09:17:42Z&spr=https&sv=2024-11-04&sr=b&sig=rinUD0%2B07m1FF67BJwaqo8jZchSxI89dXkz7R6kU23U%3D"
-          url={blobUrl}
-          title={blobName}
+          url={epubData}
+          title={blobName || ''}
           location={location}
           locationChanged={setLocation}
         />

@@ -2,10 +2,11 @@
 node_modules
 # Ignore build output
 build
-
+*.log
 # Ignore test-epub
 src/test-epub
-backend/.env
+backend/.env.dev
+backend/.env.prod
 localStorage
 # Ignore uploads
 uploads

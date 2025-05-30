@@ -16,38 +16,39 @@ const LibraryPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+      // Fetch books from API
+  const fetchBooks = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/books`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (res.status === 401) {
+        navigate('/login');
+        return;
+      }
+      if (!res.ok) {
+        throw new Error('Failed to fetch books');
+      }
+      console.log("LibraryPage.tsx, fetchBooks res: ", res)
+      const data = await res.json();
+      console.log("LibraryPage.tsx, fetchBooks data: ", data)
+      setBookBlobList(data.blob_list);  // assuming data is an array of books
+
+    } catch (err) {
+      setError('Could not load books.');
+    } finally {
+      setLoading(false);
+    }
+  };
+  
   useEffect(() => {
     // If somehow this page renders without a token, redirect (safety check)
     if (!token) {
       navigate('/login');
       return;
     }
-    // Fetch books from API
-    const fetchBooks = async () => {
-      setLoading(true);
-      try {
-        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/books`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        if (res.status === 401) {
-          navigate('/login');
-          return;
-        }
-        if (!res.ok) {
-          throw new Error('Failed to fetch books');
-        }
-        console.log("LibraryPage.tsx, fetchBooks res: ", res)
-        const data = await res.json();
-        console.log("LibraryPage.tsx, fetchBooks data: ", data)
-        setBookBlobList(data.blob_list);  // assuming data is an array of books
-
-      } catch (err) {
-        setError('Could not load books.');
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchBooks();
   }, [token, navigate]);
 
@@ -69,7 +70,7 @@ const LibraryPage: React.FC = () => {
           {bookBlobList.map(Blobitem => (
             <li key={Blobitem.id}>
               <strong>{Blobitem.id}</strong> 
-              - <Link to={`/reader/${Blobitem.name}`}>Read Book "{Blobitem.name}"</Link>
+              - <Link to={`/reader?blobName=${Blobitem.name}`}>Read Book "{Blobitem.name}"</Link>
             </li>
           ))}
         </ul>
