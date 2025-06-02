@@ -1,14 +1,18 @@
 # backend/app/main.py
 import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-import os
-from . import models, database, auth
-from .routes import auth as auth_routes, books as books_routes, chat as chat_routes
+
+from . import auth, database, models
+from .routes import auth as auth_routes
+from .routes import books as books_routes
+from .routes import chat as chat_routes
 
 # Initialize database (create tables)
-models.Base.metadata.create_all(bind=database.engine)
+# models.Base.metadata.create_all(bind=database.engine)
+database.instantiate_db()
 
 app = FastAPI(title="eReader API", version="0.1.0")
 
@@ -41,11 +45,10 @@ app.include_router(chat_routes.router, prefix="/api")
 if os.getenv("DEV_MODE"):
     def override_get_current_user():
         """
-        Return a “fake” user for development.
-        You can either construct a User in memory, or
-        fetch/create one from your database here.
+            Return a “fake” user for development.
+            You can either construct a User in memory, or
+            fetch/create one from your database here.
         """
         return models.User(id=1, username="dev-user")
-    
-    app.dependency_overrides[auth.get_current_user] = override_get_current_user
 
+    app.dependency_overrides[auth.get_current_user] = override_get_current_user

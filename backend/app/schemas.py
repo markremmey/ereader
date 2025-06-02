@@ -1,15 +1,19 @@
 # backend/app/schemas.py
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
+from uuid import UUID
+
 
 class UserCreate(BaseModel):
     username: str
     password: str
 
+
 class UserRead(BaseModel):
     id: int
     username: str
-    class Config:
-        orm_mode = True  # allows reading SQLAlchemy model instances
+
+    model_config = ConfigDict(from_attributes=True)
+
 
 class Token(BaseModel):
     access_token: str
@@ -24,8 +28,14 @@ class BlobList(BaseModel):
     blob_list: list[BlobObj]
 
 class BookInfo(BaseModel):
-    id: int
+    bookId: UUID
     title: str
+    author: str
+    blob_name: str
+    cover_blob_name: str
     content_type: str
-    class Config:
-        orm_mode = True
+
+    model_config = ConfigDict(from_attributes=True)
+
+class BookList(BaseModel):
+    book_list: list[BookInfo]

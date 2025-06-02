@@ -1,9 +1,9 @@
 # app/main.py (FastAPI backend) - Defines the /chat endpoint that streams responses token-by-token.
-from fastapi import FastAPI, Depends
+import asyncio
+
+from fastapi import APIRouter, Depends, FastAPI
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
-import asyncio
-from fastapi import APIRouter
 
 from .. import auth
 
@@ -11,12 +11,16 @@ app = FastAPI()
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
+
 # Define the request body model
 class ChatRequest(BaseModel):
     message: str
 
+
 @router.post("/chat")
-async def chat_endpoint(request: ChatRequest, current_user=Depends(auth.get_current_user)):
+async def chat_endpoint(
+    request: ChatRequest, current_user=Depends(auth.get_current_user)
+):
     """
     Accepts a user message and streams back a response token by token.
     Requires a valid authenticated user (via Depends on get_current_user).
@@ -27,7 +31,9 @@ async def chat_endpoint(request: ChatRequest, current_user=Depends(auth.get_curr
     async def generate_response():
         # In a real scenario, connect to an AI service or generate response incrementally.
         # Here we'll simulate with a dummy response split into tokens.
-        response_text = f"AI response to '{user_message}'. This is a mock streaming reply."
+        response_text = (
+            f"AI response to '{user_message}'. This is a mock streaming reply."
+        )
         for token in response_text.split():
             # Yield each token followed by a space
             yield token + " "
