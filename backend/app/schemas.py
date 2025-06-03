@@ -34,6 +34,7 @@ class BookInfo(BaseModel):
     blob_name: str
     cover_blob_name: str
     content_type: str
+    cover_blob_url: str | None = None
 
     model_config = ConfigDict(from_attributes=True)
 
