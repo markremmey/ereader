@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 
 const LoginPage: React.FC = () => {
-  const { login } = useAuth();
+  const { login, startDemoSession } = useAuth();
   const navigate = useNavigate();
   // State for form inputs and error message
   const [username, setUsername] = useState('');
@@ -19,6 +19,23 @@ const LoginPage: React.FC = () => {
       navigate('/library');  // go to library on successful login
     } catch (err) {
       setError('Login failed. Please check your credentials.');
+    }
+  };
+
+  const handleDemoLogin = async () => {
+    setError(null);
+    try {
+      // Ensure startDemoSession is available from AuthContext
+      if (!startDemoSession) {
+        console.error("startDemoSession is not available on AuthContext. Ensure it is implemented.");
+        setError("Demo feature not available yet. Context not updated.");
+        return;
+      }
+      await startDemoSession(); // This function will call the backend and update context
+      navigate('/library'); 
+    } catch (err) {
+      setError('Demo login failed. Please try again later.');
+      console.error("Demo login error:", err); // Log for debugging
     }
   };
 
@@ -70,12 +87,20 @@ const LoginPage: React.FC = () => {
           Log In
         </button>
       </form>
-      <p className="text-center text-gray-600 text-sm">
+      <div className="mt-4 text-center space-y-3">
+        <button
+          onClick={handleDemoLogin}
+          className="w-full py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition"
+        >
+          Try Demo
+        </button>
+        <p className="text-gray-600 text-sm">
           New user?{' '}
           <Link to="/register" className="text-indigo-600 hover:underline">
             Register here
           </Link>
         </p>
+      </div>
       </div>
     </div>
   );

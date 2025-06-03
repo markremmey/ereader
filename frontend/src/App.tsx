@@ -6,23 +6,23 @@ import LibraryPage from './pages/LibraryPage';
 import ReaderPage from './pages/ReaderPage';
 
 function App() {
-  const { token } = useAuth();  // get auth state
+  const { token, isDemoSession } = useAuth();  // get auth state, including isDemoSession
 
   return (
     <Routes>
-      {/* Redirect root to either Library (if logged in) or Login */}
+      {/* Redirect root to either Library (if logged in or in demo) or Login */}
       <Route path="/" element={
-        token ? <Navigate to="/library" replace /> : <Navigate to="/login" replace />
+        (token || isDemoSession) ? <Navigate to="/library" replace /> : <Navigate to="/login" replace />
       }/>
       {/* Public routes */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       {/* Protected routes */}
       <Route path="/library" element={
-        token ? <LibraryPage /> : <Navigate to="/login" replace />
+        (token || isDemoSession) ? <LibraryPage /> : <Navigate to="/login" replace />
       }/>
       <Route path="/reader" element={
-        token ? <ReaderPage /> : <Navigate to="/login" replace />
+        (token || isDemoSession) ? <ReaderPage /> : <Navigate to="/login" replace />
       }/>
     </Routes>
   );

@@ -1,5 +1,5 @@
 # backend/app/routes/auth.py
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy.orm import Session
 
 from .. import auth, database, models, schemas
@@ -34,3 +34,21 @@ def login(form: schemas.UserCreate, db: Session = Depends(database.get_db)):
     # Credentials valid – create JWT token
     access_token = auth.create_access_token({"sub": user.username})
     return {"access_token": access_token, "token_type": "bearer"}
+
+
+@router.post("/start-demo")
+def start_demo_session(response: Response):
+    """
+    Sets a demo_session cookie to enable demo mode for the user.
+    """
+    response.set_cookie(
+        key="demo_session",
+        value="true",
+        httponly=True,
+        samesite="lax",  # Or "strict" depending on your needs
+        secure=True,     # Set to True if served over HTTPS (recommended for production)
+        # domain="yourdomain.com", # Optional: specify your domain
+        # path="/",                 # Optional: cookie path
+        # max_age=3600,             # Optional: cookie expiry in seconds (e.g., 1 hour)
+    )
+    return {"message": "Demo session started"}

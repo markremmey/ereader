@@ -24,7 +24,7 @@ def list_books(
 
 
 @router.get("/get_full_blob_url/{blob_name}", response_model=str)
-def get_blob_sas(blob_name: str): 
+def get_blob_sas(blob_name: str, current_user: models.User = Depends(auth.get_current_user)): 
     logging.info(f"blob_name: {blob_name}")
     sasUrl = blob_service.get_sas_url_cached(blob_name, container_name="defaultlibrary")
     logging.info(f"books.py:get_blob_sas: sasUrl: {sasUrl}")
