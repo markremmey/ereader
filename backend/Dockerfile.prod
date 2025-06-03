@@ -1,5 +1,30 @@
 FROM python:3.12-slim
 
+# Install OS-level dependencies for pyodbc and MS ODBC Driver
+# Based on Microsoft's official instructions for Debian
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    gnupg \
+    unixodbc \
+    unixodbc-dev \
+    dpkg \
+    # Download and install the Microsoft repository configuration package
+    && curl -sSL -O https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb \
+    && dpkg -i packages-microsoft-prod.deb \
+    && rm packages-microsoft-prod.deb \
+    # Update apt cache again after adding new repo
+    && apt-get update \
+    # Install the ODBC driver, mssql-tools, and kerberos library
+    && ACCEPT_EULA=Y apt-get install -y --no-install-recommends \
+        msodbcsql18 \
+        mssql-tools \
+        libgssapi-krb5-2 \
+    # Clean up apt lists to reduce image size
+    && rm -rf /var/lib/apt/lists/*
+
+# Add mssql-tools to PATH
+ENV PATH="${PATH}:/opt/mssql-tools/bin"
+
 # Install uv.
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 

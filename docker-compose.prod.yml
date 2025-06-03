@@ -9,7 +9,6 @@ services:
     image: ereader-backend:latest
     env_file:
       - ./backend/.env.prod      # your DATABASE_URL, REDIS_URL, etc.
-      - REDIS_URL: unix://redis:6379
     ports:
       - "8000:8000"         # maps container’s 8000 → host’s 8000
     restart: unless-stopped
