@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ReactReader } from 'react-reader';
 import ChatWindow from '../components/ChatWindow';
 import { useSearchParams } from 'react-router-dom';
+import { FaComments, FaTimes } from 'react-icons/fa'; // Import icons
 
 const ReaderPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -11,7 +12,8 @@ const ReaderPage: React.FC = () => {
   const [location, setLocation] = useState<string | number>(
     'epubcfi(/6/2[cover]!/6)'
   );
-  
+  const [isChatOpen, setIsChatOpen] = useState(false); // State for chat visibility
+
   const fetchBlobUrl = async () => {
     try {
       // Get the blob URL from the API
@@ -42,14 +44,19 @@ const ReaderPage: React.FC = () => {
     fetchBlobUrl();
   }, [blobName]);
 
-  // While we’re loading the URL...
+  // While we're loading the URL...
   if (!blobName) {
     return <div>Loading book…</div>;
   }
 
   return (
-    <div className="flex h-screen">
-      <div className="flex-2/3 h-full overflow-hidden">
+    <div className="flex h-screen relative">
+      {/* Reader View */}
+      <div
+        className={`h-full transition-all duration-300 ease-in-out ${
+          isChatOpen ? 'w-full md:w-2/3' : 'w-full'
+        } overflow-hidden`}
+      >
         <ReactReader
           url={epubData}
           title={blobName || ''}
@@ -57,9 +64,34 @@ const ReaderPage: React.FC = () => {
           locationChanged={setLocation}
         />
       </div>
-      <div className="flex-1/3 h-full border-l p-4">
+
+      {/* Chat Window - Conditional rendering and styling for mobile/desktop */}
+      <div
+        className={`
+          h-full border-l p-4 transition-all duration-300 ease-in-out
+          fixed top-0 right-0 bg-white shadow-lg z-40                   // Mobile: base for overlay (positioning, appearance, AND Z-INDEX)
+
+          ${
+            isChatOpen ?
+            'w-full opacity-100 translate-x-0 pointer-events-auto' : // Mobile Open State - NOW FULL WIDTH
+            'w-0 opacity-0 translate-x-full pointer-events-none'      // Mobile Closed State
+          }
+
+          md:relative md:w-1/3 md:opacity-100 md:translate-x-0 md:pointer-events-auto
+          md:shadow-none md:bg-transparent
+        `}
+      >
         <ChatWindow />
       </div>
+
+      {/* Toggle Chat Button - Positioned for mobile, hidden on larger screens if chat is always visible or managed differently */}
+      <button
+        onClick={() => setIsChatOpen(!isChatOpen)}
+        className="fixed bottom-20 right-4 z-50 bg-black text-white p-3 rounded-full shadow-lg md:hidden" // Hidden on md and larger screens
+        aria-label={isChatOpen ? 'Close chat' : 'Open chat'}
+      >
+        {isChatOpen ? <FaTimes size={24} /> : <FaComments size={24} />}
+      </button>
     </div>
   );
 };

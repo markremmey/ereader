@@ -43,7 +43,7 @@ const LoginPage: React.FC = () => {
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4">
       <div className="max-w-sm w-full bg-white rounded-2xl shadow-md p-8 space-y-6">
         <h2 className="text-2xl font-semibold text-center text-gray-800">
-            Welcome Back
+            Lyceum AI
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
