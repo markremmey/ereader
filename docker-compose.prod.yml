@@ -15,15 +15,6 @@ services:
     depends_on:
       - redis
 
-  # db:
-  #   image: postgres:15-alpine
-  #   environment:
-  #     POSTGRES_USER: ereader
-  #     POSTGRES_PASSWORD: ereaderpass
-  #     POSTGRES_DB: ereader
-  #   volumes:
-  #     - db-data:/var/lib/postgresql/data
-
   frontend:
     build:
       context: ./frontend

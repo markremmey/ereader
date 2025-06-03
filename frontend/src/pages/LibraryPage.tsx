@@ -25,9 +25,7 @@ const LibraryPage: React.FC = () => {
   const fetchBooks = async () => {
     setLoading(true);
     try {
-      const baseUrl = import.meta.env.VITE_API_BASE_URL;
-      const secureBaseUrl = baseUrl.startsWith('http://') ? baseUrl.replace('http://', 'https://') : baseUrl;
-      const res = await fetch(`${secureBaseUrl}/books`, {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/books/`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
 
