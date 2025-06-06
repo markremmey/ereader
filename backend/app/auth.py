@@ -14,10 +14,10 @@ from . import database, models
 # OAuth2 scheme setup – the frontend will send the JWT in the "Authorization" header
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/login")
 # Password hashing setup
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["argon2", "bcrypt"], deprecated="auto")
 
 # Secret key and JWT settings
-SECRET_KEY = os.getenv("SECRET_KEY", "CHANGE_ME")  # In production, load a secure key
+SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
@@ -50,7 +50,7 @@ async def get_current_user(
         # Return a predefined demo user.
         # Using id=0 or a special negative ID for the demo user is a common pattern.
         # Ensure this User object is compatible with what your app expects.
-        return models.User(id=0, username="demo-user", hashed_password="demo_placeholder")
+        return models.User(id=0, email="demo@example.com", hashed_password="demo_placeholder")
 
     # 2. If not a demo session, proceed with token authentication
     token: Optional[str] = None
@@ -81,13 +81,13 @@ async def get_current_user(
 
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: Optional[str] = payload.get("sub")
-        if username is None:
+        email: Optional[str] = payload.get("sub")
+        if email is None:
             raise credentials_exception
     except JWTError:
         raise credentials_exception
     
-    user = db.query(models.User).filter(models.User.username == username).first()
+    user = db.query(models.User).filter(models.User.email == email).first()
     if user is None:
         # This means the user specified in the token doesn't exist in the DB anymore.
         raise HTTPException(

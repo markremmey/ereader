@@ -32,10 +32,10 @@ app.add_middleware(
 )
 
 # Mount uploads directory as static (optional, used if we serve files directly)
-uploads_dir = os.path.join(os.getcwd(), "uploads")
-if not os.path.isdir(uploads_dir):
-    os.makedirs(uploads_dir)
-app.mount("/uploads", StaticFiles(directory=uploads_dir), name="uploads")
+# uploads_dir = os.path.join(os.getcwd(), "uploads")
+# if not os.path.isdir(uploads_dir):
+#     os.makedirs(uploads_dir)
+# app.mount("/uploads", StaticFiles(directory=uploads_dir), name="uploads")
 
 # Include API routers (all under /api for clarity)
 app.include_router(auth_routes.router, prefix="/api")
@@ -49,6 +49,6 @@ if os.getenv("DEV_MODE"):
             You can either construct a User in memory, or
             fetch/create one from your database here.
         """
-        return models.User(id=1, username="dev-user")
+        return models.User(id=1, email="dev-user@example.com")
 
     app.dependency_overrides[auth.get_current_user] = override_get_current_user

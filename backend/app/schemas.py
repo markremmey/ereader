@@ -1,19 +1,16 @@
 # backend/app/schemas.py
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, EmailStr
 from uuid import UUID
+from fastapi_users import schemas
 
+class UserCreate(schemas.BaseUser[int]):
+    pass
 
-class UserCreate(BaseModel):
-    username: str
-    password: str
+class UserRead(schemas.BaseUser[int]):
+    pass
 
-
-class UserRead(BaseModel):
-    id: int
-    username: str
-
-    model_config = ConfigDict(from_attributes=True)
-
+class UserUpdate(schemas.BaseUser[int]):
+    pass
 
 class Token(BaseModel):
     access_token: str

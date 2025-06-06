@@ -26,7 +26,6 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const navigate = useNavigate();
   const isDev = import.meta.env.DEV;
-  console.log("AuthContext.tsx: isDev: ", isDev)
   const [token, setToken] = useState<string | null>(() => {
     if (isDev) {
       const devToken = 'dev-bypass-token';

@@ -1,20 +1,23 @@
 # backend/app/models.py
-from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, DateTime, func
 from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy.dialects.mssql import UNIQUEIDENTIFIER
+from fastapi_users.db import SQLAlchemyBaseUserTableUUID
+from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
 import uuid
 
 Base = declarative_base()
 
 
-class User(Base):
+class User(SQLAlchemyBaseUserTable[int], Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, index=True)
-    username = Column(String(50), unique=True, nullable=False, index=True)
-    hashed_password = Column(String(128), nullable=False)
-    # Potential additional fields: email, created_at, etc.
-    # books = relationship("Book", back_populates="owner")
-
+    # email = Column(String, unique=True, nullable=False, index=True)
+    # hashed_password = Column(String(128), nullable=False)
+    # is_active = Column(Boolean, default=True, nullable=False)
+    # is_superuser = Column(Boolean, default=False, nullable=False)
+    is_premium = Column(Boolean, default=False, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
 
 class Book(Base):
     __tablename__ = "books"

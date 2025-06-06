@@ -10,7 +10,9 @@ from dotenv import load_dotenv
 # from sqlalchemy.dialects.mssql import SQL_COPT_SS_ACCESS_TOKEN
 from sqlalchemy import create_engine, event
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, Session
+from fastapi_users.db import SQLAlchemyUserDatabase
+from fastapi import Depends
 from . import models
 
 logging.basicConfig(level=logging.INFO)
@@ -69,3 +71,6 @@ def get_db():
 
 def instantiate_db():
     models.Base.metadata.create_all(bind=engine)
+
+def get_user_db(session: Session = Depends(get_db)):
+    yield SQLAlchemyUserDatabase(session, models.User)
