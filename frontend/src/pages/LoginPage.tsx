@@ -4,10 +4,10 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 
 const LoginPage: React.FC = () => {
-  const { login, startDemoSession } = useAuth();
+  const { loginWithPassword, startDemoSession } = useAuth();
   const navigate = useNavigate();
   // State for form inputs and error message
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
 
@@ -15,10 +15,14 @@ const LoginPage: React.FC = () => {
     e.preventDefault();
     setError(null);
     try {
-      await login(username, password);
+      await loginWithPassword(email, password);
+      console.log("🎉 loginWithPassword completed successfully");
+      console.log("🧭 About to navigate to /library");
       navigate('/library');  // go to library on successful login
+      console.log("🔄 Navigated to /library");
     } catch (err) {
       setError('Login failed. Please check your credentials.');
+      console.error("❌ Login error:", err);
     }
   };
 
@@ -53,15 +57,15 @@ const LoginPage: React.FC = () => {
         )}
 
         <div>
-          <label className="block text-gray-700 mb-1" htmlFor="username">
-            Username
+          <label className="block text-gray-700 mb-1" htmlFor="email">
+            Email
           </label>
           <input
-            id="username"
-            type="text"
+            id="email"
+            type="email"
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
-            value={username}
-            onChange={e => setUsername(e.target.value)}
+            value={email}
+            onChange={e => setEmail(e.target.value)}
             required
           />
         </div>

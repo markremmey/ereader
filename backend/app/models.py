@@ -3,17 +3,36 @@ from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy.dialects.mssql import UNIQUEIDENTIFIER
 import uuid
+from fastapi_users import schemas
+from fastapi_users.db import SQLAlchemyBaseUserTableUUID
 
 Base = declarative_base()
 
 
-class User(Base):
+class UserRead(schemas.BaseUser[uuid.UUID]):
+    pass
+
+
+class UserCreate(schemas.BaseUserCreate):
+    pass
+
+
+class UserUpdate(schemas.BaseUserUpdate):
+    pass
+
+# Default schema for user model
+class User(SQLAlchemyBaseUserTableUUID, Base):
     __tablename__ = "users"
-    id = Column(Integer, primary_key=True, index=True)
-    username = Column(String(50), unique=True, nullable=False, index=True)
-    hashed_password = Column(String(128), nullable=False)
-    # Potential additional fields: email, created_at, etc.
-    # books = relationship("Book", back_populates="owner")
+
+
+# Legacy user model
+# class User(Base):
+#     __tablename__ = "users"
+#     id = Column(Integer, primary_key=True, index=True)
+#     username = Column(String(50), unique=True, nullable=False, index=True)
+#     hashed_password = Column(String(128), nullable=False)
+#     # Potential additional fields: email, created_at, etc.
+#     # books = relationship("Book", back_populates="owner")
 
 
 class Book(Base):

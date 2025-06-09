@@ -15,7 +15,7 @@ interface BookBlob {
 }
 
 const LibraryPage: React.FC = () => {
-  const { token, logout } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const [bookList, setBookList] = useState<BookBlob[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -26,7 +26,7 @@ const LibraryPage: React.FC = () => {
     setLoading(true);
     try {
       const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/books/`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        credentials: 'include',
       });
 
       if (res.status === 401) {
@@ -49,12 +49,12 @@ const LibraryPage: React.FC = () => {
   
   useEffect(() => {
     // If somehow this page renders without a token, redirect (safety check)
-    if (!token) {
+    if (!isAuthenticated) {
       navigate('/login');
       return;
     }
     fetchBooks();
-  }, [token, navigate]);
+  }, [isAuthenticated, navigate]);
 
   if (loading) {
     return <p>Loading your library...</p>;

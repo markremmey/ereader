@@ -3,16 +3,16 @@ from pydantic import BaseModel, ConfigDict
 from uuid import UUID
 
 
-class UserCreate(BaseModel):
-    username: str
-    password: str
+# class UserCreate(BaseModel):
+#     email: str
+#     password: str
 
 
-class UserRead(BaseModel):
-    id: int
-    username: str
+# class UserRead(BaseModel):
+#     id: UUID
+#     email: str
 
-    model_config = ConfigDict(from_attributes=True)
+#     model_config = ConfigDict(from_attributes=True)
 
 
 class Token(BaseModel):
