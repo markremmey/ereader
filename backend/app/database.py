@@ -43,7 +43,20 @@ params = urllib.parse.quote_plus(AZURE_SQL_CONNECTION_STRING)
 engine_url = f"mssql+aioodbc:///?odbc_connect={params}"
 
 # Create async engine
-engine = create_async_engine(engine_url)
+engine = create_async_engine(
+    engine_url,
+    pool_pre_ping=True,
+    pool_recycle=3000,
+    pool_size=10,
+    max_overflow=20,
+    pool_timeout=30,
+    # Connection args for Azure SQL timeouts
+    connect_args={
+        "timeout": 60,     # Connection establishment timeout
+        "login_timeout": 60,  # Login timeout
+    }
+)
+
 AsyncSessionLocal = sessionmaker(
     bind=engine, 
     class_=AsyncSession,
@@ -82,3 +95,14 @@ async def get_db():
 async def instantiate_db():
     async with engine.begin() as conn:
         await conn.run_sync(models.Base.metadata.create_all)
+
+async def cleanup_db():
+    """
+    Cleanup database connections and resources during application shutdown.
+    """
+    logging.info("Shutting down database connections...")
+    
+    # Dispose of the engine - this closes all connections in the pool
+    await engine.dispose()
+    
+    logging.info("Database connections closed successfully")

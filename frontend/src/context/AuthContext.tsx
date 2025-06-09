@@ -29,22 +29,13 @@ export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const navigate = useNavigate();
-  const isDev = import.meta.env.DEV;
-  console.log("AuthContext.tsx: isDev: ", isDev)
   
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
-    if (isDev) {
-      return true; // In dev mode, assume authenticated
-    }
-    return false;
-  });
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isDemoSession, setIsDemoSession] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // Check authentication status by calling a backend endpoint
   const checkAuthStatus = async () => {
-    console.log("🔍 Checking auth status...");
-    console.log("Current isAuthenticated state:", isAuthenticated)
     setIsLoading(true);
     try {
       const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/me`, {
@@ -138,12 +129,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Check auth status on app load
   React.useEffect(() => {
-    // if (!isDev) {
-    //   checkAuthStatus();
-    // } else {
-    //   setIsLoading(false);
-    // }
-    checkAuthStatus();
+    checkAuthStatus()
   }, []);
 
   const value = { 

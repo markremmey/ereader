@@ -6,7 +6,7 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
 from .. import auth
-
+from ..users import current_active_user
 app = FastAPI()
 
 router = APIRouter(prefix="/chat", tags=["chat"])
@@ -19,7 +19,7 @@ class ChatRequest(BaseModel):
 
 @router.post("/chat")
 async def chat_endpoint(
-    request: ChatRequest, current_user=Depends(auth.get_current_user)
+    request: ChatRequest, current_user=Depends(current_active_user)
 ):
     """
     Accepts a user message and streams back a response token by token.

@@ -16,7 +16,8 @@ async def lifespan(app: FastAPI):
     # Initialize database (create tables)
     await database.instantiate_db()
     yield
-    # Cleanup code could go here if needed
+    # Cleanup: properly dispose of all database connections
+    await database.cleanup_db()
 
 app = FastAPI(title="eReader API", version="0.1.0", lifespan=lifespan)
 
@@ -46,14 +47,14 @@ app.include_router(auth_routes.router, prefix="/api")
 app.include_router(books_routes.router, prefix="/api")
 app.include_router(chat_routes.router, prefix="/api")
 
-if os.getenv("DEV_MODE"):
-    def override_get_current_user():
-        """
-            Return a "fake" user for development.
-            You can either construct a User in memory, or
-            fetch/create one from your database here.
-        """
-        import uuid
-        return models.User(id=uuid.uuid4(), email="dev@example.com")
+# if os.getenv("DEV_MODE"):
+#     def override_get_current_user():
+#         """
+#             Return a "fake" user for development.
+#             You can either construct a User in memory, or
+#             fetch/create one from your database here.
+#         """
+#         import uuid
+#         return models.User(id=uuid.uuid4(), email="dev@example.com")
 
-    app.dependency_overrides[auth.get_current_user] = override_get_current_user
+#     app.dependency_overrides[auth.get_current_user] = override_get_current_user

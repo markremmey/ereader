@@ -6,7 +6,7 @@ from sqlalchemy import select
 
 from .. import auth, database, models, schemas
 from ..services.storage import AzureBlobStorageService
-
+from ..users import current_active_user
 logging.basicConfig(level=logging.INFO)
 router = APIRouter(prefix="/books", tags=["books"])
 
@@ -15,7 +15,7 @@ blob_service = AzureBlobStorageService()
 @router.get("/", response_model=schemas.BookList)
 async def list_books(
     db: AsyncSession = Depends(database.get_db),
-    current_user: models.User = Depends(auth.get_current_user),
+    current_user: models.User = Depends(current_active_user),
 ):
     stmt = select(models.Book)
     result = await db.execute(stmt)
@@ -28,7 +28,7 @@ async def list_books(
 
 
 @router.get("/get_full_blob_url/{blob_name}", response_model=str)
-async def get_blob_sas(blob_name: str, current_user: models.User = Depends(auth.get_current_user)): 
+async def get_blob_sas(blob_name: str, current_user: models.User = Depends(current_active_user)): 
     logging.info(f"blob_name: {blob_name}")
     sasUrl = blob_service.get_sas_url_cached(blob_name, container_name="defaultlibrary")
     logging.info(f"books.py:get_blob_sas: sasUrl: {sasUrl}")
@@ -39,7 +39,7 @@ async def get_blob_sas(blob_name: str, current_user: models.User = Depends(auth.
 async def get_book_file(
     book_id: int,
     db: AsyncSession = Depends(database.get_db),
-    current_user: models.User = Depends(auth.get_current_user),
+    current_user: models.User = Depends(current_active_user),
 ):
     
     return None

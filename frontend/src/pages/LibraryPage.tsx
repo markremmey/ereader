@@ -79,7 +79,7 @@ const LibraryPage: React.FC = () => {
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-4">
           {bookList.map(book => (
-            <Link key={book.bookId} to={`/reader?blobName=${book.blob_name}`} className="block border rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <Link key={book.bookId} to={`/reader?blobName=${book.blob_name}&title=${book.title}`} className="block border rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
               <img 
                 src={book.cover_blob_url} 
                 alt={`${book.title} cover`} 

@@ -7,6 +7,7 @@ import { FaComments, FaTimes } from 'react-icons/fa'; // Import icons
 const ReaderPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const blobName = searchParams.get('blobName');
+  const title = searchParams.get('title');
   console.log("ReaderPage.tsx, blobName: ", blobName);
   const [epubData, setEpubData] = useState<ArrayBuffer | string>("");
   const [location, setLocation] = useState<string | number>(
@@ -18,18 +19,18 @@ const ReaderPage: React.FC = () => {
     try {
       // Get the blob URL from the API
       const res = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/books/get_full_blob_url/${blobName}`
+        `${import.meta.env.VITE_API_BASE_URL}/books/get_full_blob_url/${blobName}`,
+        {
+          credentials: 'include',
+        }
       );
       if (!res.ok) throw new Error('Failed to fetch blob URL');
       const url = await res.json();
-      console.log("url: ", url);
 
       // Get the epub data from the blob URL
       const epubRes = await fetch(url);
-      console.log("epubRes: ", epubRes);
       if (!epubRes.ok) throw new Error('Failed to fetch epub');
       const epubArrayBuffer = await epubRes.arrayBuffer();
-      console.log("epubArrayBuffer: ", epubArrayBuffer);
 
       setEpubData(epubArrayBuffer);
     } catch (err) {
@@ -39,7 +40,6 @@ const ReaderPage: React.FC = () => {
   
   useEffect(() => {
     if (!blobName) return;
-    console.log("ReaderPage.tsx, useEffect, fetching blobName: ", blobName);
 
     fetchBlobUrl();
   }, [blobName]);
@@ -59,7 +59,7 @@ const ReaderPage: React.FC = () => {
       >
         <ReactReader
           url={epubData}
-          title={blobName || ''}
+          title={title || ''}
           location={location}
           locationChanged={setLocation}
         />

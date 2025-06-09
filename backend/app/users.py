@@ -14,6 +14,8 @@ from .database import get_user_db
 import os
 
 SECRET = os.getenv("SECRET_KEY")
+if not SECRET:
+    raise ValueError("SECRET_KEY environment variable must be set")
 
 
 class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
@@ -38,7 +40,9 @@ async def get_user_manager(user_db: SQLAlchemyUserDatabase = Depends(get_user_db
     yield UserManager(user_db)
 
 
-cookie_transport = CookieTransport(cookie_name="session", cookie_max_age=3600)
+cookie_transport = CookieTransport(
+    cookie_name="session", cookie_max_age=30 * 24 * 3600
+)
 
 
 def get_jwt_strategy() -> JWTStrategy:

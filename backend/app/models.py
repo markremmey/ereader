@@ -12,10 +12,8 @@ Base = declarative_base()
 class UserRead(schemas.BaseUser[uuid.UUID]):
     pass
 
-
 class UserCreate(schemas.BaseUserCreate):
     pass
-
 
 class UserUpdate(schemas.BaseUserUpdate):
     pass
@@ -23,17 +21,6 @@ class UserUpdate(schemas.BaseUserUpdate):
 # Default schema for user model
 class User(SQLAlchemyBaseUserTableUUID, Base):
     __tablename__ = "users"
-
-
-# Legacy user model
-# class User(Base):
-#     __tablename__ = "users"
-#     id = Column(Integer, primary_key=True, index=True)
-#     username = Column(String(50), unique=True, nullable=False, index=True)
-#     hashed_password = Column(String(128), nullable=False)
-#     # Potential additional fields: email, created_at, etc.
-#     # books = relationship("Book", back_populates="owner")
-
 
 class Book(Base):
     __tablename__ = "books"

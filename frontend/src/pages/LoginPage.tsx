@@ -16,13 +16,10 @@ const LoginPage: React.FC = () => {
     setError(null);
     try {
       await loginWithPassword(email, password);
-      console.log("🎉 loginWithPassword completed successfully");
-      console.log("🧭 About to navigate to /library");
       navigate('/library');  // go to library on successful login
-      console.log("🔄 Navigated to /library");
     } catch (err) {
       setError('Login failed. Please check your credentials.');
-      console.error("❌ Login error:", err);
+      console.error("Login error:", err);
     }
   };
 

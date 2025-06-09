@@ -2,7 +2,7 @@
 from fastapi import APIRouter, Depends, Response
 
 from .. import auth, models
-from ..users import fastapi_users, auth_backend
+from ..users import fastapi_users, auth_backend, current_active_user
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -21,7 +21,7 @@ router.include_router(
 
 
 @router.get("/me", response_model=models.UserRead)
-async def get_current_user_info(current_user: models.User = Depends(auth.get_current_user)):
+async def get_current_user_info(current_user: models.User = Depends(current_active_user)):
     """
     Get current user information. Works with both JWT and demo session.
     """
