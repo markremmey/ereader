@@ -53,8 +53,8 @@ def logout(response: Response):
     """
     response.delete_cookie(
         key="demo_session",
-        httponly=True,
-        samesite="lax",
-        secure=True,
+    )
+    response.delete_cookie(
+        key="session",
     )
     return {"message": "Logged out successfully"}
