@@ -8,11 +8,11 @@ from azure.identity import DefaultAzureCredential
 # Connection string for Azure SQL - get this from environment variables
 from dotenv import load_dotenv
 # from sqlalchemy.dialects.mssql import SQL_COPT_SS_ACCESS_TOKEN
-from sqlalchemy import create_engine, event
+from sqlalchemy import event
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import sessionmaker
 from fastapi_users.db import SQLAlchemyUserDatabase
-from fastapi import Depends
 from . import models
 
 logging.basicConfig(level=logging.INFO)
@@ -40,19 +40,38 @@ if not AZURE_SQL_CONNECTION_STRING:
 # connection_string = 'Driver={};Server=tcp:{}.database.windows.net,1433;Database={};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30'.format(driver_name, server_name, database_name)
 # URL-encode the ODBC connection string
 params = urllib.parse.quote_plus(AZURE_SQL_CONNECTION_STRING)
-engine_url = f"mssql+pyodbc:///?odbc_connect={params}"
+engine_url = f"mssql+aioodbc:///?odbc_connect={params}"
 
+# Create async engine
+engine = create_async_engine(
+    engine_url,
+    pool_pre_ping=True,
+    pool_recycle=3000,
+    pool_size=10,
+    max_overflow=20,
+    pool_timeout=30,
+    # Connection args for Azure SQL timeouts
+    connect_args={
+        "timeout": 60,     # Connection establishment timeout
+        "login_timeout": 60,  # Login timeout
+    }
+)
 
-engine = create_engine(engine_url)
-SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
+AsyncSessionLocal = sessionmaker(
+    bind=engine, 
+    class_=AsyncSession,
+    autoflush=False, 
+    autocommit=False
+)
 
 credential = DefaultAzureCredential()
 TOKEN_URL = "https://database.windows.net/.default"
 
-@event.listens_for(engine, "do_connect")
+@event.listens_for(engine.sync_engine, "do_connect")
 def provide_token(dialect, conn_rec, cargs, cparams):
     # remove the "Trusted_Connection" parameter that SQLAlchemy adds
-    cargs[0] = cargs[0].replace(";Trusted_Connection=Yes", "")
+    if cargs and len(cargs) > 0:
+        cargs[0] = cargs[0].replace(";Trusted_Connection=Yes", "")
 
     # create token credential
     raw_token = credential.get_token(TOKEN_URL).token.encode("utf-16-le")
@@ -61,16 +80,29 @@ def provide_token(dialect, conn_rec, cargs, cparams):
     # apply it to keyword arguments
     cparams["attrs_before"] = {SQL_COPT_SS_ACCESS_TOKEN: token_struct}
 
-# Dependency to get DB session
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+async def get_user_db():
+    async with AsyncSessionLocal() as session:
+        yield SQLAlchemyUserDatabase(session, models.User)
 
-def instantiate_db():
-    models.Base.metadata.create_all(bind=engine)
+# Async dependency to get DB session
+async def get_db():
+    async with AsyncSessionLocal() as db:
+        try:
+            yield db
+        finally:
+            await db.close()
 
-def get_user_db(session: Session = Depends(get_db)):
-    yield SQLAlchemyUserDatabase(session, models.User)
+async def instantiate_db():
+    async with engine.begin() as conn:
+        await conn.run_sync(models.Base.metadata.create_all)
+
+async def cleanup_db():
+    """
+    Cleanup database connections and resources during application shutdown.
+    """
+    logging.info("Shutting down database connections...")
+    
+    # Dispose of the engine - this closes all connections in the pool
+    await engine.dispose()
+    
+    logging.info("Database connections closed successfully")

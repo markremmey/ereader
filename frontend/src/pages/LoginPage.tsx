@@ -4,10 +4,10 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 
 const LoginPage: React.FC = () => {
-  const { login, startDemoSession } = useAuth();
+  const { loginWithPassword, startDemoSession } = useAuth();
   const navigate = useNavigate();
   // State for form inputs and error message
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
 
@@ -15,10 +15,39 @@ const LoginPage: React.FC = () => {
     e.preventDefault();
     setError(null);
     try {
-      await login(username, password);
+      await loginWithPassword(email, password);
       navigate('/library');  // go to library on successful login
     } catch (err) {
       setError('Login failed. Please check your credentials.');
+      console.error("Login error:", err);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+    // Redirect to the backend endpoint that starts the Google OAuth flow
+    // The backend will then redirect to Google's authentication page.
+    // Ensure VITE_API_BASE_URL is correctly set in your .env file (e.g., http://localhost:8000)\
+      const authorizationUrl = `${import.meta.env.VITE_API_BASE_URL}/auth/google/authorize`;
+      console.log("Authorization URL: ", authorizationUrl);
+      const res = await fetch(authorizationUrl);
+      if (!res.ok) {
+        console.error("Failed response:", res);
+        throw new Error("Could not fetch the Google authorization URL from the backend.");
+      }
+
+      // 2. Extract the actual Google URL from the JSON response
+      const data = await res.json();
+      const googleRedirectUrl = data.authorization_url;
+      if (typeof googleRedirectUrl !== 'string') {
+        throw new Error("Authorization URL not found or invalid in the response from the backend.");
+      }
+
+      // 3. Redirect the user to Google's login page
+      window.location.href = googleRedirectUrl;
+    } catch (err) {
+      setError('Google login failed. Please try again later.');
+      console.error("Google login error:", err); // Log for debugging
     }
   };
 
@@ -81,15 +110,15 @@ const LoginPage: React.FC = () => {
         )}
 
         <div>
-          <label className="block text-gray-700 mb-1" htmlFor="username">
-            Username
+          <label className="block text-gray-700 mb-1" htmlFor="email">
+            Email
           </label>
           <input
-            id="username"
-            type="text"
+            id="email"
+            type="email"
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
-            value={username}
-            onChange={e => setUsername(e.target.value)}
+            value={email}
+            onChange={e => setEmail(e.target.value)}
             required
           />
         </div>

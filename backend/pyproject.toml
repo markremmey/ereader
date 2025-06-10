@@ -5,7 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
- "asyncpg>=0.30.0",
+ "aioodbc>=0.5.0",
  "azure-identity>=1.23.0",
  "azure-storage-blob>=12.25.1",
  "bcrypt>=4.3.0",

@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useAuth } from '../context/AuthContext';
 
 type Message = {
   sender: 'user' | 'bot';
@@ -8,15 +7,12 @@ type Message = {
 
 const ChatWindow: React.FC = () => {
   // console.log("ChatWindow")
-
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState<string>('');
   const [isStreaming, setIsStreaming] = useState<boolean>(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
-  const { token } = useAuth();
-
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -51,9 +47,10 @@ const ChatWindow: React.FC = () => {
       try {
         const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/chat/chat`, {
           method: 'POST',
+          credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
+            // 'Authorization': `Bearer ${token}`,
           },
           body: JSON.stringify({ message: inputText }),
         });

@@ -6,23 +6,37 @@ import LibraryPage from './pages/LibraryPage';
 import ReaderPage from './pages/ReaderPage';
 
 function App() {
-  const { token, isDemoSession } = useAuth();  // get auth state, including isDemoSession
-
+  const { isAuthenticated, isLoading } = useAuth();
+  
+  console.log("🚀 App render - isAuthenticated:", isAuthenticated, "isLoading:", isLoading);
+  // Show loading spinner while checking authentication
+  if (isLoading) {
+    console.log("⏳ Showing loading spinner");
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+  
   return (
     <Routes>
-      {/* Redirect root to either Library (if logged in or in demo) or Login */}
+      {/* Redirect root to either Library (if authenticated) or Login */}
       <Route path="/" element={
-        (token || isDemoSession) ? <Navigate to="/library" replace /> : <Navigate to="/login" replace />
+        isAuthenticated ? <Navigate to="/library" replace /> : <Navigate to="/login" replace />
       }/>
       {/* Public routes */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       {/* Protected routes */}
       <Route path="/library" element={
-        (token || isDemoSession) ? <LibraryPage /> : <Navigate to="/login" replace />
+        isAuthenticated ? <LibraryPage /> : <Navigate to="/login" replace />
       }/>
       <Route path="/reader" element={
-        (token || isDemoSession) ? <ReaderPage /> : <Navigate to="/login" replace />
+        isAuthenticated ? <ReaderPage /> : <Navigate to="/login" replace />
       }/>
     </Routes>
   );

@@ -15,7 +15,7 @@ interface BookBlob {
 }
 
 const LibraryPage: React.FC = () => {
-  const { token, logout } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const [bookList, setBookList] = useState<BookBlob[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -26,7 +26,7 @@ const LibraryPage: React.FC = () => {
     setLoading(true);
     try {
       const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/books/`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        credentials: 'include',
       });
 
       if (res.status === 401) {
@@ -49,12 +49,12 @@ const LibraryPage: React.FC = () => {
   
   useEffect(() => {
     // If somehow this page renders without a token, redirect (safety check)
-    if (!token) {
+    if (!isAuthenticated) {
       navigate('/login');
       return;
     }
     fetchBooks();
-  }, [token, navigate]);
+  }, [isAuthenticated, navigate]);
 
   if (loading) {
     return <p>Loading your library...</p>;
@@ -79,7 +79,7 @@ const LibraryPage: React.FC = () => {
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-4">
           {bookList.map(book => (
-            <Link key={book.bookId} to={`/reader?blobName=${book.blob_name}`} className="block border rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <Link key={book.bookId} to={`/reader?blobName=${book.blob_name}&title=${book.title}`} className="block border rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
               <img 
                 src={book.cover_blob_url} 
                 alt={`${book.title} cover`} 
