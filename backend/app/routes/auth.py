@@ -3,6 +3,9 @@ from fastapi import APIRouter, Depends, Response
 
 from .. import auth, models
 from ..users import fastapi_users, auth_backend, current_active_user
+import os
+
+router = APIRouter(prefix="/auth", tags=["auth"])
 
 # Google OAuth2 client configuration
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")

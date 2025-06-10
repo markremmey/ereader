@@ -51,33 +51,33 @@ const LoginPage: React.FC = () => {
     }
   };
 
-  const handleGoogleLogin = async () => {
-    try {
-    // Redirect to the backend endpoint that starts the Google OAuth flow
-    // The backend will then redirect to Google's authentication page.
-    // Ensure VITE_API_BASE_URL is correctly set in your .env file (e.g., http://localhost:8000)\
-      const authorizationUrl = `${import.meta.env.VITE_API_BASE_URL}/auth/google/authorize`;
-      console.log("Authorization URL: ", authorizationUrl);
-      const res = await fetch(authorizationUrl);
-      if (!res.ok) {
-        console.error("Failed response:", res);
-        throw new Error("Could not fetch the Google authorization URL from the backend.");
-      }
+  // const handleGoogleLogin = async () => {
+  //   try {
+  //   // Redirect to the backend endpoint that starts the Google OAuth flow
+  //   // The backend will then redirect to Google's authentication page.
+  //   // Ensure VITE_API_BASE_URL is correctly set in your .env file (e.g., http://localhost:8000)\
+  //     const authorizationUrl = `${import.meta.env.VITE_API_BASE_URL}/auth/google/authorize`;
+  //     console.log("Authorization URL: ", authorizationUrl);
+  //     const res = await fetch(authorizationUrl);
+  //     if (!res.ok) {
+  //       console.error("Failed response:", res);
+  //       throw new Error("Could not fetch the Google authorization URL from the backend.");
+  //     }
 
-      // 2. Extract the actual Google URL from the JSON response
-      const data = await res.json();
-      const googleRedirectUrl = data.authorization_url;
-      if (typeof googleRedirectUrl !== 'string') {
-        throw new Error("Authorization URL not found or invalid in the response from the backend.");
-      }
+  //     // 2. Extract the actual Google URL from the JSON response
+  //     const data = await res.json();
+  //     const googleRedirectUrl = data.authorization_url;
+  //     if (typeof googleRedirectUrl !== 'string') {
+  //       throw new Error("Authorization URL not found or invalid in the response from the backend.");
+  //     }
 
-      // 3. Redirect the user to Google's login page
-      window.location.href = googleRedirectUrl;
-    } catch (err) {
-      setError('Google login failed. Please try again later.');
-      console.error("Google login error:", err); // Log for debugging
-    }
-  };
+  //     // 3. Redirect the user to Google's login page
+  //     window.location.href = googleRedirectUrl;
+  //   } catch (err) {
+  //     setError('Google login failed. Please try again later.');
+  //     console.error("Google login error:", err); // Log for debugging
+  //   }
+  // };
 
   const handleDemoLogin = async () => {
     setError(null);
