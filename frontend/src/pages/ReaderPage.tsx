@@ -3,51 +3,28 @@ import { ReactReader } from 'react-reader';
 import ChatWindow from '../components/ChatWindow';
 import { useSearchParams } from 'react-router-dom';
 import { FaComments, FaTimes } from 'react-icons/fa'; // Import icons
+import { useEpub } from '../hooks';
 
 const ReaderPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const blobName = searchParams.get('blobName');
   const title = searchParams.get('title');
-  console.log("ReaderPage.tsx, blobName: ", blobName);
-  const [epubData, setEpubData] = useState<ArrayBuffer | string>("");
-  const [location, setLocation] = useState<string | number>(
-    'epubcfi(/6/2[cover]!/6)'
-  );
+
+  const { data: epubData, isLoading, error } = useEpub(blobName);
+  
+  const [location, setLocation] = useState<string | number>(() => {
+    const saved = localStorage.getItem(`location-${blobName}`);
+    return saved ? saved : 'epubcfi(/6/2[cover]!/6)';
+  });
   const [isChatOpen, setIsChatOpen] = useState(false); // State for chat visibility
 
-  const fetchBlobUrl = async () => {
-    try {
-      // Get the blob URL from the API
-      const res = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/books/get_full_blob_url/${blobName}`,
-        {
-          credentials: 'include',
-        }
-      );
-      if (!res.ok) throw new Error('Failed to fetch blob URL');
-      const url = await res.json();
-
-      // Get the epub data from the blob URL
-      const epubRes = await fetch(url);
-      if (!epubRes.ok) throw new Error('Failed to fetch epub');
-      const epubArrayBuffer = await epubRes.arrayBuffer();
-
-      setEpubData(epubArrayBuffer);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-  
+  // Save the location to local storage
   useEffect(() => {
-    if (!blobName) return;
+    localStorage.setItem(`location-${blobName}`, location.toString());
+  }, [blobName, location]);
 
-    fetchBlobUrl();
-  }, [blobName]);
-
-  // While we're loading the URL...
-  if (!blobName) {
-    return <div>Loading book…</div>;
-  }
+  if (!blobName || isLoading) return <div>Loading book…</div>;
+  if (error)    return <div>Error loading book</div>;
 
   return (
     <div className="flex h-screen relative">
@@ -58,7 +35,7 @@ const ReaderPage: React.FC = () => {
         } overflow-hidden`}
       >
         <ReactReader
-          url={epubData}
+          url={epubData!}
           title={title || ''}
           location={location}
           locationChanged={setLocation}
@@ -69,12 +46,12 @@ const ReaderPage: React.FC = () => {
       <div
         className={`
           h-full border-l p-4 transition-all duration-300 ease-in-out
-          fixed top-0 right-0 bg-white shadow-lg z-40                   // Mobile: base for overlay (positioning, appearance, AND Z-INDEX)
+          fixed top-0 right-0 bg-white shadow-lg z-40
 
           ${
             isChatOpen ?
-            'w-full opacity-100 translate-x-0 pointer-events-auto' : // Mobile Open State - NOW FULL WIDTH
-            'w-0 opacity-0 translate-x-full pointer-events-none'      // Mobile Closed State
+            'w-full opacity-100 translate-x-0 pointer-events-auto' :
+            'w-0 opacity-0 translate-x-full pointer-events-none'
           }
 
           md:relative md:w-1/3 md:opacity-100 md:translate-x-0 md:pointer-events-auto
@@ -84,10 +61,9 @@ const ReaderPage: React.FC = () => {
         <ChatWindow />
       </div>
 
-      {/* Toggle Chat Button - Positioned for mobile, hidden on larger screens if chat is always visible or managed differently */}
       <button
         onClick={() => setIsChatOpen(!isChatOpen)}
-        className="fixed bottom-20 right-4 z-50 bg-black text-white p-3 rounded-full shadow-lg md:hidden" // Hidden on md and larger screens
+        className="fixed bottom-20 right-4 z-50 bg-black text-white p-3 rounded-full shadow-lg md:hidden"
         aria-label={isChatOpen ? 'Close chat' : 'Open chat'}
       >
         {isChatOpen ? <FaTimes size={24} /> : <FaComments size={24} />}
