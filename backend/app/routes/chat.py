@@ -1,9 +1,11 @@
 # app/main.py (FastAPI backend) - Defines the /chat endpoint that streams responses token-by-token.
 import asyncio
+import os
 
 from fastapi import APIRouter, Depends, FastAPI
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
+from openai import AzureOpenAI
 
 from .. import auth
 from ..users import current_active_user
@@ -11,14 +13,85 @@ app = FastAPI()
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
+# Initialize Azure OpenAI client
+endpoint = os.getenv("ENDPOINT_URL")
+deployment = os.getenv("DEPLOYMENT_NAME")
+subscription_key = os.getenv("AZURE_OPENAI_API_KEY")
+
+client = AzureOpenAI(
+    azure_endpoint=endpoint,
+    api_key=subscription_key,
+    api_version="2025-01-01-preview",
+)
 
 # Define the request body model
 class ChatRequest(BaseModel):
     message: str
 
-
+# Implement a real chat endpoint with azure openai
 @router.post("/chat")
 async def chat_endpoint(
+    request: ChatRequest, current_user=Depends(current_active_user)
+):
+    """
+    Accepts a user message and streams back a response from Azure OpenAI token by token.
+    Requires a valid authenticated user (via Depends on current_active_user).
+    """
+    user_message = request.message
+
+    # Prepare the chat prompt
+    messages = [
+        {
+            "role": "system",
+            "content": [
+                {
+                    "type": "text",
+                    "text": "You are an AI assistant that answers questions about a book."
+                }
+            ]
+        },
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": user_message
+                }
+            ]
+        }
+    ]
+
+    async def generate_response():
+        try:
+            # Generate the streaming completion
+            completion = client.chat.completions.create(
+                model=deployment,
+                messages=messages,
+                max_tokens=800,
+                temperature=0.7,
+                top_p=0.95,
+                frequency_penalty=0,
+                presence_penalty=0,
+                stop=None,
+                stream=True  # Enable streaming
+            )
+
+            # Stream the response token by token
+            for chunk in completion:
+                if chunk.choices and len(chunk.choices) > 0:
+                    if chunk.choices[0].delta.content is not None:
+                        yield chunk.choices[0].delta.content
+                    
+        except Exception as e:
+            # Handle errors gracefully
+            print(f"Chat endpoint error: {str(e)}")  # Log to console for debugging
+            yield f"Error: {str(e)}"
+
+    # Return a StreamingResponse that streams the content from OpenAI
+    return StreamingResponse(generate_response(), media_type="text/plain")
+
+@router.post("/mock_chat")
+async def mock_chat_endpoint(
     request: ChatRequest, current_user=Depends(current_active_user)
 ):
     """

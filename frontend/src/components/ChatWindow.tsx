@@ -55,8 +55,11 @@ const ChatWindow: React.FC = () => {
           body: JSON.stringify({ message: inputText }),
         });
 
+        console.log('Response status:', res.status); // Debug logging
+        console.log('Response headers:', res.headers); // Debug logging
+
         if (!res.ok) {
-          throw new Error('Failed to send message');
+          throw new Error(`Failed to send message: ${res.status} ${res.statusText}`);
         }
 
         setMessages(m => [...m, { sender: 'bot', text: '' }]);
@@ -74,6 +77,7 @@ const ChatWindow: React.FC = () => {
           done = doneReading;
           if (value) {
             const chunk = decoder.decode(value, { stream: true });
+            console.log('Received chunk:', chunk); // Debug logging
             // Append the chunk to the last (bot) message
             setMessages(m => {
               const updated = [...m];
