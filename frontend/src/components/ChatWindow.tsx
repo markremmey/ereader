@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import ReactMarkdown from 'react-markdown';
 
 type Message = {
   sender: 'user' | 'bot';
@@ -56,7 +57,7 @@ const ChatWindow: React.FC = () => {
         });
 
         if (!res.ok) {
-          throw new Error('Failed to send message');
+          throw new Error(`Failed to send message: ${res.status} ${res.statusText}`);
         }
 
         setMessages(m => [...m, { sender: 'bot', text: '' }]);
@@ -74,16 +75,22 @@ const ChatWindow: React.FC = () => {
           done = doneReading;
           if (value) {
             const chunk = decoder.decode(value, { stream: true });
-            // Append the chunk to the last (bot) message
-            setMessages(m => {
-              const updated = [...m];
-              const last = updated[updated.length - 1];
-              updated[updated.length - 1] = {
-                sender: 'bot',
-                text: last.text + chunk,
-              };
-              return updated;
-            });
+            console.log('Received chunk:', JSON.stringify(chunk)); // Debug logging with JSON to see exact content
+            console.log('Chunk length:', chunk.length); // Debug chunk size
+            
+            // Only update if chunk has content
+            if (chunk.trim().length > 0) {
+              // Append the chunk to the last (bot) message
+              setMessages(m => {
+                const updated = [...m];
+                const last = updated[updated.length - 1];
+                updated[updated.length - 1] = {
+                  sender: 'bot',
+                  text: last.text + chunk,
+                };
+                return updated;
+              });
+            }
           }
         }
 
@@ -111,7 +118,27 @@ const ChatWindow: React.FC = () => {
                 : 'max-w-[100%] self-start bg-white text-black rounded-bl-none'
             }`}
           >
-            {msg.text}
+            {msg.sender === 'bot' ? (
+              <div className="markdown-content">
+                <ReactMarkdown
+                  components={{
+                    // Custom styling for different elements
+                    p: ({ children }) => <p className="mb-2 leading-relaxed">{children}</p>,
+                    ol: ({ children }) => <ol className="list-decimal list-inside mb-2 ml-2 space-y-1">{children}</ol>,
+                    ul: ({ children }) => <ul className="list-disc list-inside mb-2 ml-2 space-y-1">{children}</ul>,
+                    li: ({ children }) => <li className="leading-relaxed">{children}</li>,
+                    strong: ({ children }) => <strong className="font-bold text-black">{children}</strong>,
+                    em: ({ children }) => <em className="italic">{children}</em>,
+                    code: ({ children }) => <code className="bg-gray-100 px-1 py-0.5 rounded text-sm font-mono">{children}</code>,
+                    pre: ({ children }) => <pre className="bg-gray-100 p-2 rounded text-sm font-mono overflow-x-auto mb-2">{children}</pre>
+                  }}
+                >
+                  {msg.text}
+                </ReactMarkdown>
+              </div>
+            ) : (
+              msg.text
+            )}
           </div>
         ))}
         {/* Sentinel for scrolling */}
