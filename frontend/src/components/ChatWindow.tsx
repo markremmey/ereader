@@ -100,6 +100,7 @@ const ChatWindow: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full bg-white text-black rounded-lg shadow-sm">
+      {/* Messages container */}
       <div
         ref={containerRef}
         onScroll={handleScroll}
@@ -111,6 +112,7 @@ const ChatWindow: React.FC = () => {
         <div ref={bottomRef} />
       </div>
 
+      {/* Input container */}
       <div className="relative border-t border-gray-300 p-2 flex items-center">
         {showScrollButton && <ScrollToBottom onClick={scrollToBottom} />}
         <ChatInput
