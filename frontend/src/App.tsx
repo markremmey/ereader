@@ -6,6 +6,8 @@ import LibraryPage from './pages/LibraryPage';
 import ReaderPage from './pages/ReaderPage';
 import BillingSuccessPage from './pages/BillingSuccessPage';
 import BillingCancelPage from './pages/BillingCancelPage';
+import ProfilePage from './pages/ProfilePage';
+
 
 function App() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -39,6 +41,9 @@ function App() {
       }/>
       <Route path="/reader" element={
         isAuthenticated ? <ReaderPage /> : <Navigate to="/login" replace />
+      }/>
+      <Route path="/profile" element={
+        isAuthenticated ? <ProfilePage /> : <Navigate to="/login" replace />
       }/>
     </Routes>
   );

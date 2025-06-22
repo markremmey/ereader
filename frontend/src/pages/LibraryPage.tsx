@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import ProfileDropdown from '../components/ProfileDropdown';
 
 // Define a TypeScript interface for Book (adjust fields based on actual API)
 interface BookBlob {
@@ -15,7 +16,7 @@ interface BookBlob {
 }
 
 const LibraryPage: React.FC = () => {
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [bookList, setBookList] = useState<BookBlob[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -70,9 +71,7 @@ const LibraryPage: React.FC = () => {
     <div className="flex flex-col h-screen p-4">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">Your Library</h2>
-        <button onClick={logout} className="text-red-500 underline">
-          Log Out
-        </button>
+        <ProfileDropdown />
       </div>
       {bookList.length === 0 ? (
         <p>No books found. Upload some books to get started!</p>

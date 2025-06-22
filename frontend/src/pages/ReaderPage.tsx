@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ReactReader } from 'react-reader';
-import ChatWindow from '../components/ChatWindow';
+import ChatWindow from '../components/chat/ChatWindow';
 import { useSearchParams } from 'react-router-dom';
 import { FaComments, FaTimes } from 'react-icons/fa'; // Import icons
 import { useEpub } from '../hooks/useEpub';

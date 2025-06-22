@@ -36,3 +36,24 @@ async def create_checkout_session(
         return {"sessionId": session.id}
     except stripe.error.StripeError as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+@router.post("/create-portal-session")
+async def create_portal_session(
+    current_user: models.User = Depends(current_active_user),
+):
+    """
+    Create a Stripe Customer Portal session for subscription management.
+    This allows users to update payment methods, view invoices, cancel subscriptions, etc.
+    """
+    if not current_user.stripe_customer_id:
+        raise HTTPException(status_code=400, detail="No subscription found")
+    
+    try:
+        # Create a portal session
+        session = stripe.billing_portal.Session.create(
+            customer=current_user.stripe_customer_id,
+            return_url=f"{os.getenv('FRONTEND_URL')}/profile",
+        )
+        return {"url": session.url}
+    except stripe.error.StripeError as e:
+        raise HTTPException(status_code=400, detail=str(e))

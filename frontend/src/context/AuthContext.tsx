@@ -1,6 +1,7 @@
 // src/context/AuthContext.tsx
 import React, { createContext, useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 
 // Define the shape of our auth context state and functions
 interface AuthContextType {
@@ -29,7 +30,7 @@ export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const navigate = useNavigate();
-  
+  const queryClient = useQueryClient();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isDemoSession, setIsDemoSession] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -79,7 +80,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!res.ok) {
       throw new Error('Invalid credentials');
     }
-    
+    queryClient.invalidateQueries({ queryKey: ['currentUser'] });
     // After successful login, check auth status to update state
     await checkAuthStatus();
   };
@@ -121,6 +122,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error) {
       console.error("Error during logout:", error);
     } finally {
+      queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+      queryClient.clear();
       setIsAuthenticated(false);
       setIsDemoSession(false);
       navigate('/login');

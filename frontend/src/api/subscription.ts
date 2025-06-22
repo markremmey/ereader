@@ -7,6 +7,10 @@ export interface CheckoutSessionResponse {
   sessionId: string;
 }
 
+export interface PortalSessionResponse {
+  url: string;
+}
+
 export const handleSubscribe = async (currentUser: { id: string; email: string }): Promise<void> => {
   try {
     const stripe = await stripePromise;
@@ -47,5 +51,33 @@ export const handleSubscribe = async (currentUser: { id: string; email: string }
     }
   } catch (error) {
     console.error('Error during subscription:', error);
+  }
+};
+
+export const handleManageSubscription = async (): Promise<void> => {
+  try {
+    // Call backend to create a Portal Session
+    const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/payments/create-portal-session`, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    });
+
+    if (!res.ok) {
+      throw new Error(`Failed to create portal session: ${res.status} ${res.statusText}`);
+    }
+
+    const data: PortalSessionResponse = await res.json();
+    
+    if (data.url) {
+      // Redirect to Stripe Customer Portal
+      window.location.href = data.url;
+    } else {
+      console.error("Failed to create Stripe Portal session");
+    }
+  } catch (error) {
+    console.error('Error during portal session creation:', error);
   }
 };

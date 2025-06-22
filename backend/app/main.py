@@ -12,6 +12,7 @@ from .routes import books as books_routes
 from .routes import chat as chat_routes
 from .routes import checkout as checkout_routes
 from .routes import webhook as webhook_routes
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Initialize database (create tables)

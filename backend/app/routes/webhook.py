@@ -25,6 +25,7 @@ async def stripe_webhook(request: Request, db: AsyncSession = Depends(get_db)):
 
     # Handle the event types we care about
     if event['type'] == 'checkout.session.completed':
+        
         session = event['data']['object']    # Stripe Checkout Session object
         customer_id = session.get('customer')
         subscription_id = session.get('subscription')
@@ -37,6 +38,7 @@ async def stripe_webhook(request: Request, db: AsyncSession = Depends(get_db)):
             user.stripe_customer_id = customer_id
             user.stripe_subscription_id = subscription_id
             await db.commit()
+    
     elif event['type'] == 'invoice.payment_failed':
         # Subscription payment failed – mark user as not subscribed (or grace period handling)
         invoice = event['data']['object']
@@ -46,6 +48,7 @@ async def stripe_webhook(request: Request, db: AsyncSession = Depends(get_db)):
         if user:
             user.is_subscribed = False
             await db.commit()
+    
     elif event['type'] == 'customer.subscription.deleted':
         # Subscription canceled – mark user as unsubscribed
         sub = event['data']['object']
