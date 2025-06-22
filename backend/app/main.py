@@ -10,7 +10,8 @@ from . import auth, database, models
 from .routes import auth as auth_routes
 from .routes import books as books_routes
 from .routes import chat as chat_routes
-
+from .routes import checkout as checkout_routes
+from .routes import webhook as webhook_routes
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Initialize database (create tables)
@@ -46,7 +47,8 @@ app.add_middleware(
 app.include_router(auth_routes.router, prefix="/api")
 app.include_router(books_routes.router, prefix="/api")
 app.include_router(chat_routes.router, prefix="/api")
-
+app.include_router(checkout_routes.router, prefix="/api")
+app.include_router(webhook_routes.router, prefix="/api")
 # if os.getenv("DEV_MODE"):
 #     def override_get_current_user():
 #         """

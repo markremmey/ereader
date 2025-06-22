@@ -1,0 +1,141 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "extensions_enablevmAccess_username": {
+            "type": "SecureString"
+        },
+        "extensions_enablevmAccess_password": {
+            "type": "SecureString"
+        },
+        "extensions_enablevmAccess_ssh_key": {
+            "type": "SecureString"
+        },
+        "extensions_enablevmAccess_reset_ssh": {
+            "type": "SecureString"
+        },
+        "extensions_enablevmAccess_remove_user": {
+            "type": "SecureString"
+        },
+        "extensions_enablevmAccess_expiration": {
+            "type": "SecureString"
+        },
+        "virtualMachines_ereader_name": {
+            "defaultValue": "ereader",
+            "type": "String"
+        },
+        "disks_ereader_disk1_eee617a6f03240aba4a1f5da71519763_externalid": {
+            "defaultValue": "/subscriptions/58360d6a-cbcb-4991-83ad-0466b411a59e/resourceGroups/RG-EREADER/providers/Microsoft.Compute/disks/ereader_disk1_eee617a6f03240aba4a1f5da71519763",
+            "type": "String"
+        },
+        "networkInterfaces_ereader916_z1_externalid": {
+            "defaultValue": "/subscriptions/58360d6a-cbcb-4991-83ad-0466b411a59e/resourceGroups/rg-ereader/providers/Microsoft.Network/networkInterfaces/ereader916_z1",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2024-11-01",
+            "name": "[parameters('virtualMachines_ereader_name')]",
+            "location": "eastus",
+            "zones": [
+                "1"
+            ],
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "Standard_B1ms"
+                },
+                "additionalCapabilities": {
+                    "hibernationEnabled": false
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "canonical",
+                        "offer": "ubuntu-24_04-lts",
+                        "sku": "server",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "osType": "Linux",
+                        "name": "[concat(parameters('virtualMachines_ereader_name'), '_disk1_eee617a6f03240aba4a1f5da71519763')]",
+                        "createOption": "FromImage",
+                        "caching": "ReadWrite",
+                        "managedDisk": {
+                            "id": "[parameters('disks_ereader_disk1_eee617a6f03240aba4a1f5da71519763_externalid')]"
+                        },
+                        "deleteOption": "Delete"
+                    },
+                    "dataDisks": [],
+                    "diskControllerType": "SCSI"
+                },
+                "osProfile": {
+                    "computerName": "[parameters('virtualMachines_ereader_name')]",
+                    "adminUsername": "azureuser",
+                    "linuxConfiguration": {
+                        "disablePasswordAuthentication": true,
+                        "ssh": {
+                            "publicKeys": [
+                                {
+                                    "path": "/home/azureuser/.ssh/authorized_keys",
+                                    "keyData": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDLtQCBxb95EbmnhFnr9gshkRFVxRjpBKdY+v517MQTthNeHoR8GeH7V4B9tvVXyidPEHqgTzbesyhB65xLKrD3sMjERPL/XqdHU6MifL8snkmGNXgnbZRwJuwij458LoJlz4QA5aKSwiqlWzvotlS7umavBkc1t8rNIy2zaNgDG2BiDeloK3avnnel9Q+kKj1F1m+T5aGmkKdjUkz39QP4R/noge0v1RqaTx116/5Cnf59h8YgbWAveATKRy1jLkAGJ80E/kz1vQQe9EdwPWmOQQhtOe5L/im8djWJdDiyyDAOfI3+2gLHQFkW4Dw8yfaiHGSTZ8LibdSqajDY1UMA9Vd8HI64cd3TV/is+2TkVCPL7f/vZLqZErGC2jU/wCgCy1/XJO4Nt8lFx7hmmnjTarIZ3tg3G78e3VuhzC2gjlVrf7+5OdBQVd7cFBUTgJdjP7VqJjge+TAhZ1M6uMPyf6/YSu4P3wvcWYYEwEUZyTlM16o81E7NNa+DS+y7xieQArfpnSTbfaIsoKUldqlCjiozxoiMS9FUYRriUl1TD4rzkkl5kcewaVfZki1ofVV9uOQgvNL8rnQSGxu5P4xbSO1YvTktWLzQlqJWnMx070uYpvVP5onpZpfl5Ftj9uWm+RU6UCZwPiz8TV0VmFrK+mQ+9xGjzM949Vghw7ziXw== mremmey7@gmail.com"
+                                }
+                            ]
+                        },
+                        "provisionVMAgent": true,
+                        "patchSettings": {
+                            "patchMode": "ImageDefault",
+                            "assessmentMode": "ImageDefault"
+                        }
+                    },
+                    "secrets": [],
+                    "allowExtensionOperations": true,
+                    "requireGuestProvisionSignal": true
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[parameters('networkInterfaces_ereader916_z1_externalid')]",
+                            "properties": {
+                                "deleteOption": "Delete"
+                            }
+                        }
+                    ]
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2024-11-01",
+            "name": "[concat(parameters('virtualMachines_ereader_name'), '/enablevmAccess')]",
+            "location": "eastus",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('virtualMachines_ereader_name'))]"
+            ],
+            "properties": {
+                "autoUpgradeMinorVersion": true,
+                "publisher": "Microsoft.OSTCExtensions",
+                "type": "VMAccessForLinux",
+                "typeHandlerVersion": "1.5",
+                "settings": {},
+                "protectedSettings": {
+                    "username": "[parameters('extensions_enablevmAccess_username')]",
+                    "password": "[parameters('extensions_enablevmAccess_password')]",
+                    "ssh_key": "[parameters('extensions_enablevmAccess_ssh_key')]",
+                    "reset_ssh": "[parameters('extensions_enablevmAccess_reset_ssh')]",
+                    "remove_user": "[parameters('extensions_enablevmAccess_remove_user')]",
+                    "expiration": "[parameters('extensions_enablevmAccess_expiration')]"
+                }
+            }
+        }
+    ]
+}

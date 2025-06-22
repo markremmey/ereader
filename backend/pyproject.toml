@@ -25,6 +25,7 @@ dependencies = [
  "python-jose[cryptography]>=3.4.0",
  "redis>=6.0.0",
  "sqlalchemy>=2.0.40",
+ "stripe>=12.2.0",
 ]
 
 [project.optional-dependencies]

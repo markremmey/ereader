@@ -4,12 +4,12 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import LibraryPage from './pages/LibraryPage';
 import ReaderPage from './pages/ReaderPage';
+import BillingSuccessPage from './pages/BillingSuccessPage';
+import BillingCancelPage from './pages/BillingCancelPage';
 
 function App() {
   const { isAuthenticated, isLoading } = useAuth();
-  
-  console.log("🚀 App render - isAuthenticated:", isAuthenticated, "isLoading:", isLoading);
-  // Show loading spinner while checking authentication
+    // Show loading spinner while checking authentication
   if (isLoading) {
     console.log("⏳ Showing loading spinner");
     return (
@@ -31,6 +31,8 @@ function App() {
       {/* Public routes */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/billing/success" element={<BillingSuccessPage />} />
+      <Route path="/billing/cancel" element={<BillingCancelPage />} />
       {/* Protected routes */}
       <Route path="/library" element={
         isAuthenticated ? <LibraryPage /> : <Navigate to="/login" replace />

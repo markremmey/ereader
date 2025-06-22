@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
+import { useCurrentUser } from '../hooks/useCurrentUser';
+import { handleSubscribe } from '../api/subscription';
 
 type Message = {
   sender: 'user' | 'bot';
@@ -7,7 +9,7 @@ type Message = {
 };
 
 const ChatWindow: React.FC = () => {
-  // console.log("ChatWindow")
+  const { data: currentUser, isLoading } = useCurrentUser();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState<string>('');
   const [isStreaming, setIsStreaming] = useState<boolean>(false);
@@ -19,12 +21,28 @@ const ChatWindow: React.FC = () => {
   useEffect(() => {
     const ta = textareaRef.current;
     if (!ta) return;
-    // reset height to shrink when you delete text
     ta.style.height = 'auto';
-    // then set it to the scrollHeight (its full content height)
     ta.style.height = ta.scrollHeight + 'px';
   }, [inputText]);
-  
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+  console.log("ChatWindow: currentUser", currentUser);
+  if (!currentUser?.is_subscribed) {
+    return (
+      <div className="subscribe-prompt">
+        <p>Your account is currently <strong>free</strong>. Subscribe to access premium features like the chat!</p>
+        <button 
+          onClick={() => currentUser && handleSubscribe(currentUser)}
+          disabled={!currentUser}
+          className="bg-gray text-black px-4 py-2 hover:border rounded-r-md disabled:text-black disabled:opacity-100"
+        >
+          Subscribe for $10/month
+        </button>
+      </div>
+    );
+  }
 
   // scroll handler
   const handleScroll = () => {

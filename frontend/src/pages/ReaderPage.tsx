@@ -3,7 +3,7 @@ import { ReactReader } from 'react-reader';
 import ChatWindow from '../components/ChatWindow';
 import { useSearchParams } from 'react-router-dom';
 import { FaComments, FaTimes } from 'react-icons/fa'; // Import icons
-import { useEpub } from '../hooks';
+import { useEpub } from '../hooks/useEpub';
 
 const ReaderPage: React.FC = () => {
   const [searchParams] = useSearchParams();

@@ -6,7 +6,8 @@ from fastapi import APIRouter, Depends, FastAPI
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from openai import AsyncAzureOpenAI
-
+from fastapi import HTTPException
+from app.models import User
 from .. import auth
 from ..users import current_active_user
 app = FastAPI()
@@ -28,10 +29,15 @@ client = AsyncAzureOpenAI(
 class ChatRequest(BaseModel):
     message: str
 
+def verify_subscription(user: User = Depends(current_active_user)):
+    if not user.is_subscribed:
+        raise HTTPException(status_code=403, detail="Subscription required")
+    return user
+
 # Implement a real chat endpoint with azure openai
 @router.post("/chat")
 async def chat_endpoint(
-    request: ChatRequest, current_user=Depends(current_active_user)
+    request: ChatRequest, user: User = Depends(verify_subscription)
 ):
     """
     Accepts a user message and streams back a response from Azure OpenAI token by token.
@@ -81,10 +87,7 @@ async def chat_endpoint(
                 if chunk.choices and len(chunk.choices) > 0:
                     if chunk.choices[0].delta.content is not None:
                         content = chunk.choices[0].delta.content
-                        print(f"Yielding chunk: '{content}'")  # Debug logging
                         yield content
-                        # Add a small delay to ensure chunks are separate
-                        # await asyncio.sleep(0.01)
                     
         except Exception as e:
             # Handle errors gracefully

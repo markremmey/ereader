@@ -6,17 +6,6 @@ from fastapi_users import schemas
 class UserCreate(schemas.BaseUser[int]):
     pass
 
-# class UserCreate(BaseModel):
-#     email: str
-#     password: str
-
-
-# class UserRead(BaseModel):
-#     id: UUID
-#     email: str
-
-#     model_config = ConfigDict(from_attributes=True)
-
 class UserUpdate(schemas.BaseUser[int]):
     pass
 

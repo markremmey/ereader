@@ -12,7 +12,9 @@ Base = declarative_base()
 
 
 class UserRead(schemas.BaseUser[uuid.UUID]):
-    pass
+    is_subscribed: bool
+    stripe_customer_id: str | None = None
+    stripe_subscription_id: str | None = None
 
 class UserCreate(schemas.BaseUserCreate):
     pass
@@ -23,6 +25,9 @@ class UserUpdate(schemas.BaseUserUpdate):
 # Default schema for user model
 class User(SQLAlchemyBaseUserTableUUID, Base):
     __tablename__ = "users"
+    is_subscribed = Column(Boolean, default=False)
+    stripe_customer_id = Column(String(200), nullable=True)
+    stripe_subscription_id = Column(String(200), nullable=True)
 
 class Book(Base):
     __tablename__ = "books"
