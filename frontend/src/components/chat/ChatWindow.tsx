@@ -3,7 +3,7 @@ import { useCurrentUser } from '../../hooks/useCurrentUser';
 import { handleSubscribe } from '../../api/subscription';
 import ChatMessage from './ChatMessage';
 import ChatInput from './ChatInput';
-import ScrollToBottom from '../ScrollToBottom';
+import ScrollToBottom from './ScrollToBottom';
 
 export type Message = {
   sender: 'user' | 'bot';
