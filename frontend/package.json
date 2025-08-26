@@ -20,7 +20,7 @@
     "react-markdown": "^10.1.0",
     "react-reader": "^2.0.13",
     "react-router-dom": "^7.5.3",
-    "tailwindcss": "^4.1.7",
+    "tailwindcss": "^4.1.11",
     "tanstack": "^1.0.0"
   },
   "devDependencies": {
